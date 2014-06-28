@@ -46,16 +46,17 @@ engineALJP.setOptions = function(argOptions) {
  * Récupère le canvas, et intialise le context qui est disponible via engineALJP.ctx
  */
 engineALJP.init = function() {
+    /* On récupère le contexte du canvas */
 	var ctx;
 	engineALJP.canvas = document.getElementById(engineALJP.options.idSelector);
-	console.log(engineALJP.canvas);
+    engineALJP.canvas.width  = engineALJP.options.width;
+    engineALJP.canvas.height = engineALJP.options.height;
 	if(typeof engineALJP.canvas !== "undefined")
 		ctx = engineALJP.canvas.getContext('2d');
 	engineALJP.ctx = ctx;
 
+    /* On fait un espace blanc */
 	ctx.rect(0,0,engineALJP.options.width,engineALJP.options.height);
 	ctx.fillStyle="#ffffff";
 	ctx.fill();
-}
-
-
+};

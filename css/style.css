@@ -6,12 +6,53 @@
 
 body {
 	background-color: #000;
+    color: #777;
 	font-size: 16pt;
 }
 
 #gameContainer {
-	margin: 200px auto;
+	margin: 200px auto 50px;
 	width: 400px;
 	height: 240px;
 	/*background-color: #fff;*/
+}
+
+#controls {
+    width: 300px;
+    color: #ddd;
+    margin: 0 auto;
+}
+
+form {
+    display: table;
+    width: 100%;
+}
+
+.form-group {
+    display: table-row;
+}
+
+.form-cell {
+    padding: 5px 10px;
+    display: table-cell;
+}
+
+.form-cell:first-child {
+    width: 60%;
+}
+
+#controls input {
+    text-align: center;
+}
+
+.form-cell:last-child {
+    width: 40%;
+}
+
+.left {
+    text-align: left;
+}
+
+.right {
+    text-align: right;
 }
