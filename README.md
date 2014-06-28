@@ -1,4 +1,5 @@
 # README
+-------
 
 Construction du gameengine pour les jeux made by Aurélie et Julien.
 Le but ici est de construire un moteur de jeu qui satisfait nos besoins sans avoir un surplus de fonctionnalités qui ne
@@ -52,8 +53,14 @@ Chaque objet ou classe devra respecter la norme suivante ([inspiré par ce lien]
 Ainsi pour déclarer une variable de type maClass, on fait :
 
     var class_maVariable = new engineALJP.nomDuModule.maClass();
-
+    
 Grâce à ca, on peut tester le type de la variable via la fonction instanceof engineALJP.nomDuModule.maClass
+
+De plus, si on objet a besoin d'avoir une fonction différente (ex: update d'un objet canvas), sans passer par de l'héritage, on peut faire directement :
+
+    class_maVariable.nomFonction = function(arg1, arg2) {
+        // nouveau corps de fonction
+    };
 
 #### Héritage
 Afin de simplifier le code, on va utiliser la méthode [Object.create()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
