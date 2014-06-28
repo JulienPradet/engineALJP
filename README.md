@@ -9,8 +9,6 @@ Par exemple, si on crée une Map particulière, il va dans le jeu. Si on cree un
 un objet qui permet de controller les mouvements du joueur, il va dans l'engine.
 
 ## Structure des fichiers javascript
-=========
-
 On va respecter quelques conventions afin de pouvoir revenir sur les codes l'un de l'autre.
 
 ### Utilisations de fonctions javascript
@@ -35,7 +33,6 @@ Chaque objet ou classe devra respecter la norme suivante ([inspiré par ce lien]
 
 #### Déclaration
 
-    ```javascript
     /* Déclaration de la classe */
     engineALJP.nomDuModule.maClass = function(argConstructeur1, argConstructeur2, ...) {
         var _this = this;
@@ -52,19 +49,17 @@ Chaque objet ou classe devra respecter la norme suivante ([inspiré par ce lien]
     engineALJP.nomDuModule.maClass.prototype.nomFonction = function(arg1, arg2, ...) {
         ...
     };
-    ```
 
-    Ainsi pour déclarer une variable de type maClass, on fait :
-    ```javascript
+Ainsi pour déclarer une variable de type maClass, on fait :
+
     var class_maVariable = new engineALJP.nomDuModule.maClass();
-    ```
-
-    Grâce à ca, on peut tester le type de la variable via la fonction instanceof engineALJP.nomDuModule.maClass
+    
+Grâce à ca, on peut tester le type de la variable via la fonction instanceof engineALJP.nomDuModule.maClass
 
 #### Héritage
 Afin de simplifier le code, on va utiliser la méthode [Object.create()](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/create)
 Ainsi, ca nous donne :
-    ```javascript
+
     engineALJP.nomDuModule.maClassFille = function() {
         ...
     };
@@ -73,4 +68,3 @@ Ainsi, ca nous donne :
     engineALJP.nomDuModule.maClassFille.prototype.nomFonction2 = function() {
         ...
     };
-    ```
