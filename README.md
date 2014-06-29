@@ -8,6 +8,10 @@ et ce qui concerne uniquement le jeu en cours de construction doit se trouver da
 Par exemple, si on crée une Map particulière, il va dans le jeu. Si on cree un bloc d'eau, il va dans le jeu. Par contre, si on ajoute
 un objet qui permet de controller les mouvements du joueur, il va dans l'engine.
 
+## Unités utilisées
+Pour l'instant on fait tout en **pixels**. Il faudra certainement faire des ajustements si on veut être compatible avec tablettes et téléphones.
+Pour les angles de rotation, on les stock en **radians**. A l'initialisation on peut faire le calcul pour transformer les degrés en radians, mais dans tout stockage, on les met en radian pour éviter des calculs supplémentaires dans la gestion du canvas.
+
 ## Structure des fichiers javascript
 On va respecter quelques conventions afin de pouvoir revenir sur les codes l'un de l'autre.
 

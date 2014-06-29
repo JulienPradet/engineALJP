@@ -1,6 +1,7 @@
 /**
  * Module de gestion de carte
  * Nécessite les modules :
+ *     - mod-canvas.js
  *     - mod-sprite.js
  *     - mod-NPC.js
  */
@@ -18,8 +19,8 @@ engineALJP.map = {};
 /**
  * Bloc constituant la map
  * @param options
- *      - x Position latérale de l'objet
- *      - y Position verticale de l'objet
+ *      - x Position latérale de l'objet dans la map
+ *      - y Position verticale de l'objet dans la map
  *      - angle Orientation de l'objet
  *      - width largeur
  *      - height hauteur
@@ -30,7 +31,7 @@ engineALJP.map = {};
  *      - state : Etat du bloc (normal, branlant, entrain de se détruire, en feu, etc. - Cet état est décrit selon le jeu qui crée ses propres types d'états)
  *              Par défaut, on a 0 - supprimé, 1 - normal
  */
-engineALJP.map.bloc = function(options) {
+engineALJP.map.Bloc = function(options) {
     var _this = this; /* Permet d'avoir acces au this dans les fonctions */
     /* Constructeur */
     (function() {
@@ -82,7 +83,7 @@ engineALJP.map.bloc = function(options) {
  * Getter de la position de l'objet
  * @returns {{top: Number, left: Number, angle: Number}} Position courante de l'objet
  */
-engineALJP.map.bloc.prototype.getPosition = function() {
+engineALJP.map.Bloc.prototype.getPosition = function() {
     return ({
         top: this.y,
         left: this.x,
@@ -95,7 +96,7 @@ engineALJP.map.bloc.prototype.getPosition = function() {
  * @param options {{top: Number, left: Number, angle: Number}} Paramètres à changer
  * @returns {{top: Number, left: Number, angle: Number}} Nouvelle position de l'objet
  */
-engineALJP.map.bloc.prototype.setPosition = function(options) {
+engineALJP.map.Bloc.prototype.setPosition = function(options) {
     if(typeof options.top !== "undefined")
         this.y = options.top;
 
@@ -116,7 +117,7 @@ engineALJP.map.bloc.prototype.setPosition = function(options) {
  * Fonction qui change l'état du bloc - Modifiee dans le cas de blocs complexes
  * @param state
  */
-engineALJP.map.bloc.prototype.changeState = function(state) {
+engineALJP.map.Bloc.prototype.changeState = function(state) {
     this.state = state;
 };
 
@@ -125,7 +126,7 @@ engineALJP.map.bloc.prototype.changeState = function(state) {
  * @param map map dans laquelle est inséré le bloc et où il faut l'enlever une fois la suppression terminée
  * @param index index du bloc dans la map
  */
-engineALJP.map.bloc.prototype.deleteBloc = function(map, index) {
+engineALJP.map.Bloc.prototype.deleteBloc = function(map, index) {
     this.changeState(0); /* Passe en état détruit */
     /* Par défaut, dès qu'un bloc est détruit, on l'enlève de la map : Comportement a modifier selon le jeu et le type de blocs */
     map.removeBloc(index);
@@ -135,7 +136,7 @@ engineALJP.map.bloc.prototype.deleteBloc = function(map, index) {
  * Fonction qui dessine le bloc en canvas
  * @param ctx Context du canvas où il faut pouvoir dessiner
  */
-engineALJP.map.bloc.prototype.draw = function(ctx) {
+engineALJP.map.Bloc.prototype.draw = function(ctx) {
     /* On s'assure que le bloc est dans la zone visible */
     if(this.x + this.width > 0
         && this.x - this.width < engineALJP.options.width
@@ -144,8 +145,7 @@ engineALJP.map.bloc.prototype.draw = function(ctx) {
 
         /* Si c'est une chaine de caractère décrivant une couleur hexadecimale */
         if(typeof this.background === "string" && !!this.background.match(/^#([0-9A-Fa-f]{3}){1,2}/)) {
-            ctx.fillStyle = this.background;
-            ctx.fillRect(this.x,this.y,this.width,this.height);
+            engineALJP.canvasExtension.drawRotatedRectangle(this.x, this.y, this.width, this.height, this.angle, this.background);
 
         /* Si c'est un sprite */
         } else if(this.background instanceof engineALJP.sprite.sprite) {
@@ -163,31 +163,46 @@ engineALJP.map.bloc.prototype.draw = function(ctx) {
 
 /**
  * Map constituée de blocs, et de personnages non joueurs (PNJ (No-Player Caracter - NPC en anglais))
- * @param blocs {Array.<engineALJP.map.bloc>} Tableau de blocs
+ * @param x position latérale
+ * @param y position verticale
+ * @param angle angle de rotation
+ * @param argBlocs {Array.<engineALJP.map.Bloc>} Tableau de blocs
  * @param npcs {Array.<engineALJP.npc.npc>} Tableau de pnj
  */
-engineALJP.map.map = function(argBlocs, npcs) {
+engineALJP.map.Map = function(x, y, angle, argBlocs, npcs) {
     var _this = this;
 
     (function() {
+        _this.x = x;
+        _this.y = y;
+        _this.angle = angle;
         _this.blocs = argBlocs;
+        _this.npcs = npcs;
     })();
 };
 
+engineALJP.map.Map.prototype.getPosition = function() {
+    return ({
+        top: this.y,
+        left: this.x,
+        angle: this.angle
+    });
+}
+
 /**
  * Getter des blocs constituants la map
- * @returns {Array.<engineALJP.map.bloc>}
+ * @returns {Array.<engineALJP.map.Bloc>}
  */
-engineALJP.map.map.prototype.getBlocs = function() {
+engineALJP.map.Map.prototype.getBlocs = function() {
     return this.blocs;
 };
 
 /**
  * Ajoute des blocs à la map
  * @param bloc
- * @returns {Array.<engineALJP.map.bloc>|engineALJP.map.bloc}
+ * @returns {Array.<engineALJP.map.Bloc>|engineALJP.map.Bloc}
  */
-engineALJP.map.map.prototype.addBlocs = function(bloc) {
+engineALJP.map.Map.prototype.addBlocs = function(bloc) {
     /* S'il s'agit d'un tableau de blocs */
     if(typeof bloc === "Array") {
         var key;
@@ -196,7 +211,7 @@ engineALJP.map.map.prototype.addBlocs = function(bloc) {
         }
 
     /* S'il s'agit d'un bloc unique */
-    } else if(bloc instanceof engineALJP.map.bloc) {
+    } else if(bloc instanceof engineALJP.map.Bloc) {
         this.blocs.push(bloc);
     }
     return this.blocs;
@@ -206,7 +221,7 @@ engineALJP.map.map.prototype.addBlocs = function(bloc) {
  * Supprime un bloc en lançant l'animation de destruction par exemple
  * @param {Number} index du bloc
  */
-engineALJP.map.map.prototype.deleteBloc = function(index) {
+engineALJP.map.Map.prototype.deleteBloc = function(index) {
     this.blocs[index].deleteBloc(this, index);
 };
 
@@ -214,17 +229,39 @@ engineALJP.map.map.prototype.deleteBloc = function(index) {
  * Supprime un bloc du tableau des blocs (généralement après que l'animation de suppression soit faite
  * @param {Number} index
  */
-engineALJP.map.map.prototype.removeBloc = function(index) {
+engineALJP.map.Map.prototype.removeBloc = function(index) {
     this.blocs.splice(index, 1);
 };
 
-engineALJP.map.map.prototype.draw = function(ctx) {
+/**
+ * Ajoute des incréments de position à la map
+ * @param incrementX latéral
+ * @param incrementY vertical
+ * @param incrementAngle angulaire
+ */
+engineALJP.map.Map.prototype.update = function(incrementX, incrementY, incrementAngle) {
+    this.x = this.x + incrementX;
+    this.y = this.y + incrementY;
+    this.angle = this.angle + incrementAngle;
+};
+
+/**
+ * Fonction qui dessine la map
+ * @param ctx Contexte du canvas
+ */
+engineALJP.map.Map.prototype.draw = function(ctx) {
     /* On efface la surface concernée par la map */
+    ctx.save();
+    ctx.translate(this.x + engineALJP.options.width/2, this.y + engineALJP.options.height/2);
+    ctx.rotate(this.angle);
+    ctx.translate(- engineALJP.options.width/2, - engineALJP.options.height/2);
+    ctx.beginPath();
     ctx.rect(0,0,engineALJP.options.width,engineALJP.options.height);
-    ctx.fillStyle="#ffffff";
+    ctx.fillStyle = "#fff";
     ctx.fill();
-//    ctx.clearRect(0,0, engineALJP.options.width, engineALJP.options.height);
     for(var i = 0; i < this.blocs.length; i++) {
         this.blocs[i].draw(ctx);
     }
+    ctx.restore();
 };
+

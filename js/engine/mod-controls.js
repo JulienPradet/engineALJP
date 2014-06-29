@@ -5,6 +5,8 @@
 
 engineALJP.controls = {};
 
+engineALJP.controls.changeHoldingEvent = new Event("engineALJP_holdingChange");
+
 /**
  * Permet de connaître les touches qui sont actuellement pressées par l'utilisateur
  * @type {Array}
@@ -17,6 +19,7 @@ engineALJP.controls.holding = [];
 engineALJP.controls.updateHolding = function() {
     var devInfo = document.getElementById("devInfo");
     devInfo.innerHTML = engineALJP.controls.holding.toString();
+    document.dispatchEvent(engineALJP.controls.changeHoldingEvent);
 };
 
 /**
@@ -87,7 +90,7 @@ engineALJP.controls.updateCodeToAction = function() {
         keyCode = engineALJP.controls.actionToCode[action];
         engineALJP.controls.codeToAction[keyCode] = action;
     }
-}
+};
 
 /**
  * Initialisation du formulaire de configuration des touches
