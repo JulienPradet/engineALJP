@@ -32,10 +32,10 @@ engineALJP.options = {
  */
 engineALJP.setOptions = function(argOptions) {
 	if(typeof argOptions.idSelector !== "undefined")
-		engineALJP.idSelector = argOptions.idSelector;
+		engineALJP.options.idSelector = argOptions.idSelector;
 
 	if(typeof argOptions.width !== "undefined")
-		engineALJP.width = argOptions.width;
+		engineALJP.options.width = argOptions.width;
 
 	if(typeof argOptions.height !== "undefined")
 		engineALJP.height = argOptions.height;

@@ -8,6 +8,7 @@ body {
 	background-color: #000;
     color: #777;
 	font-size: 16pt;
+    overflow-y: scroll;
 }
 
 #title {

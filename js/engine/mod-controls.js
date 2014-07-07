@@ -27,8 +27,11 @@ engineALJP.controls.updateHolding = function() {
  * @param e
  */
 document.onkeyup = function(e) {
-    engineALJP.controls.holding.splice(engineALJP.controls.holding.indexOf(engineALJP.controls.codeToAction[e.keyCode]), 1);
-    engineALJP.controls.updateHolding();
+    var index = engineALJP.controls.holding.indexOf(engineALJP.controls.codeToAction[e.keyCode]);
+    if(index > -1) {
+        engineALJP.controls.holding.splice(index, 1);
+        engineALJP.controls.updateHolding();
+    }
 };
 
 /**
@@ -38,6 +41,7 @@ document.onkeyup = function(e) {
 document.onkeydown = function(e) {
     if(typeof engineALJP.controls.codeToAction[e.keyCode] !== "undefined"
         && engineALJP.controls.holding.indexOf(engineALJP.controls.codeToAction[e.keyCode]) === -1) {
+        e.preventDefault();
         engineALJP.controls.holding.push(engineALJP.controls.codeToAction[e.keyCode]);
         engineALJP.controls.updateHolding();
     }
@@ -139,6 +143,7 @@ engineALJP.controls.initForm = function() {
         /* On ajoute le groupe au formulaire */
         form.appendChild(div);
     }
+
     /* Ajout du formulaire à la div de controls */
     document.getElementById("controls").appendChild(form);
 };

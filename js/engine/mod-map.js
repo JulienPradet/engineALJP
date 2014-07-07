@@ -257,7 +257,7 @@ engineALJP.map.Map.prototype.draw = function(ctx) {
     ctx.translate(- engineALJP.options.width/2, - engineALJP.options.height/2);
     ctx.beginPath();
     ctx.rect(0,0,engineALJP.options.width,engineALJP.options.height);
-    ctx.fillStyle = "#fff";
+    ctx.fillStyle = "#ffffff";
     ctx.fill();
     for(var i = 0; i < this.blocs.length; i++) {
         this.blocs[i].draw(ctx);
