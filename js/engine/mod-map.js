@@ -64,16 +64,16 @@ engineALJP.map.Bloc = function(options) {
                 options.background = "#79f";
             _this.background = options.background;
 
-            if (typeof options.viscosity !== "undefined")
-                _this.viscosity = {top: 0, left: 0, bottom: 0, right: 0};
+            if (typeof options.viscosity === "undefined")
+                options.viscosity = {top: 0, left: 0, bottom: 0, right: 0};
             _this.viscosity = options.viscosity;
 
-            if (typeof options.hardness !== "undefined")
-                _this.hardness = {top: true, left: true, bottom: false, right: true};
+            if (typeof options.hardness === "undefined")
+                options.hardness = {top: true, left: false, bottom: true, right: false};
             _this.hardness = options.hardness;
 
-            if (typeof options.state !== "undefined")
-                _this.hardness = 1;
+            if (typeof options.state === "undefined")
+                options.state = 1;
             _this.state = options.state;
         }
     })();
@@ -173,8 +173,10 @@ engineALJP.map.Map = function(x, y, angle, argBlocs, npcs) {
     var _this = this;
 
     (function() {
-        _this.x = x;
-        _this.y = y;
+        _this.pos_x = x;
+        _this.pos_y = y;
+        _this.velocity_x = 0;
+        _this.velocity_y = 0;
         _this.angle = angle;
         _this.blocs = argBlocs;
         _this.npcs = npcs;
@@ -183,8 +185,10 @@ engineALJP.map.Map = function(x, y, angle, argBlocs, npcs) {
 
 engineALJP.map.Map.prototype.getPosition = function() {
     return ({
-        top: this.y,
-        left: this.x,
+        pos_x: this.pos_x,
+        pos_y: this.pos_y,
+        velocity_x: this.velocity_x,
+        velocity_y: this.velocity_y,
         angle: this.angle
     });
 }
@@ -197,22 +201,26 @@ engineALJP.map.Map.prototype.getBlocs = function() {
     return this.blocs;
 };
 
+engineALJP.map.Map.prototype.getBloc = function(i, j) {
+    if(typeof this.blocs[i] === "undefined") return;
+    return this.blocs[i][j];
+};
+
+engineALJP.map.Map.prototype.readFromCSV = function(src) {
+
+};
+
 /**
  * Ajoute des blocs à la map
  * @param bloc
  * @returns {Array.<engineALJP.map.Bloc>|engineALJP.map.Bloc}
  */
-engineALJP.map.Map.prototype.addBlocs = function(bloc) {
-    /* S'il s'agit d'un tableau de blocs */
-    if(typeof bloc === "Array") {
-        var key;
-        for(key = 0; key < bloc.length; key = key + 1) {
-            this.blocs.push(bloc[key]);
-        }
-
+engineALJP.map.Map.prototype.addFixedBlocs = function(x, y, bloc) {
     /* S'il s'agit d'un bloc unique */
-    } else if(bloc instanceof engineALJP.map.Bloc) {
-        this.blocs.push(bloc);
+    if(bloc instanceof engineALJP.map.Bloc) {
+        if(typeof this.blocs[x] === "undefined")
+            this.blocs[x] = [];
+        this.blocs[x][y] = bloc;
     }
     return this.blocs;
 };
@@ -221,8 +229,8 @@ engineALJP.map.Map.prototype.addBlocs = function(bloc) {
  * Supprime un bloc en lançant l'animation de destruction par exemple
  * @param {Number} index du bloc
  */
-engineALJP.map.Map.prototype.deleteBloc = function(index) {
-    this.blocs[index].deleteBloc(this, index);
+engineALJP.map.Map.prototype.deleteFixedBloc = function(x, y) {
+    this.blocs[x][y].deleteBloc(this, x, y);
 };
 
 /**
@@ -235,14 +243,14 @@ engineALJP.map.Map.prototype.removeBloc = function(index) {
 
 /**
  * Ajoute des incréments de position à la map
- * @param incrementX latéral
- * @param incrementY vertical
- * @param incrementAngle angulaire
+ * @param increments
  */
-engineALJP.map.Map.prototype.update = function(incrementX, incrementY, incrementAngle) {
-    this.x = this.x + incrementX;
-    this.y = this.y + incrementY;
-    this.angle = this.angle + incrementAngle;
+engineALJP.map.Map.prototype.update = function(increments) {
+    this.pos_x = increments.pos_x;
+    this.pos_y = increments.pos_y;
+    this.velocity_x = increments.velocity_x;
+    this.velocity_y = increments.velocity_y;
+    this.angle = increments.angle;
 };
 
 /**
@@ -252,15 +260,23 @@ engineALJP.map.Map.prototype.update = function(incrementX, incrementY, increment
 engineALJP.map.Map.prototype.draw = function(ctx) {
     /* On efface la surface concernée par la map */
     ctx.save();
-    ctx.translate(this.x + engineALJP.options.width/2, this.y + engineALJP.options.height/2);
+    ctx.translate(Math.floor(this.pos_x) + engineALJP.options.width/2, Math.floor(this.pos_y) + engineALJP.options.height/2);
     ctx.rotate(this.angle);
     ctx.translate(- engineALJP.options.width/2, - engineALJP.options.height/2);
     ctx.beginPath();
     ctx.rect(0,0,engineALJP.options.width,engineALJP.options.height);
     ctx.fillStyle = "#ffffff";
     ctx.fill();
-    for(var i = 0; i < this.blocs.length; i++) {
-        this.blocs[i].draw(ctx);
+    var i, j,
+        length_i, length_j;
+    length_i = this.blocs.length;
+    for(i = 0; i < length_i; i++) {
+        length_j = this.blocs[i].length;
+        for(j = 0; j < length_j; j++) {
+            if(typeof this.blocs[i][j] !== "undefined") {
+                this.blocs[i][j].draw();
+            }
+        }
     }
     ctx.restore();
 };

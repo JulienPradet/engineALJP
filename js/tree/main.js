@@ -7,11 +7,13 @@ window.treeGame = {};
 treeGame.currentMap = new engineALJP.map.Map(0, 0, 0, [], []);
 
 /* Ajout de blocs pour les tests */
-treeGame.currentMap.addBlocs(new engineALJP.map.Bloc({x: 30, y: 120, angle: 0}));
-treeGame.currentMap.addBlocs(new engineALJP.map.Bloc({x:60, y: 120, angle: 0}));
+for(var i = 0; i < 400 / 16; ++i) {
+    treeGame.currentMap.addFixedBlocs(i, 14, new engineALJP.map.Bloc({x: i*16, y: 14*16, angle: 0}));
+//    treeGame.currentMap.addFixedBlocs(i, 9, new engineALJP.map.Bloc({x: i*16, y: 9*16, angle: 0}));
+}
 
-
-treeGame.mainChar = new engineALJP.char.Character(100, 200);
+console.log(engineALJP.options.width/2, engineALJP.options.height - 16);
+treeGame.mainChar = new engineALJP.char.Character(engineALJP.options.width/2, 200);
 
 /* On affiche la carte */
 engineALJP.init();
