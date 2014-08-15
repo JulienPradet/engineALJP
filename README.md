@@ -1,15 +1,12 @@
 # README
 -------
 
-<<<<<<< HEAD
-=======
 ## License
 
 This version of the engineALJP is licensed under the terms of the Open Source GPL 3.0 license.
 
 ## Le projet
 
->>>>>>> 267010cfc997aec604ec50c404e6ee5971650df9
 Construction du gameengine pour les jeux made by Aurélie et Julien.
 Le but ici est de construire un moteur de jeu qui satisfait nos besoins sans avoir un surplus de fonctionnalités qui ne
 seraient jamais utilisées. Ainsi, tout ce qui est propre au moteur de jeu doit se trouver dans le fichier `js/engine/main.js`
@@ -86,8 +83,4 @@ Ainsi, ca nous donne :
     engineALJP.nomDuModule.maClassFille.prototype = Object.create(engineALJP.nomDuModule.maClass.prototype);
     engineALJP.nomDuModule.maClassFille.prototype.nomFonction2 = function() {
         ...
-<<<<<<< HEAD
     };
-=======
-    };
->>>>>>> 267010cfc997aec604ec50c404e6ee5971650df9
