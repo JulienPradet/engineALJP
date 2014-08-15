@@ -128,8 +128,10 @@ engineALJP.move.Manager.prototype.getIncrements = function(time_diff) {
             useStep = this.actionToIncrement[action.type](this, time_diff, action.started, this.step) && useStep;
         }
     }
+
     if(useStep)
         this.actionToIncrement.physicMove(this, time_diff, action.started);
+
     return useStep;
 };
 
@@ -186,6 +188,7 @@ engineALJP.move.Manager.prototype.frame = function() {
     this.map.draw(engineALJP.ctx);
     this.char.draw(engineALJP.ctx);
 };
+
 
 engineALJP.move.Manager.prototype.drawLoop = function() {
     var _this = this;
