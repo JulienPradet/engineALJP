@@ -5,11 +5,17 @@
 var width = 16;
 var height = 16;
 
+var getRandomColor = function() {
+    /* On génére un entier aléatoire compris entre 0 inclus et 256 exclus puis on convertit en hexadécimal */
+    var alea = Math.floor(Math.random() * 256);
+    var hexString = alea.toString(16);
+    return '#' + parseInt(hexString, 16);
+};
+
 var Character = function(x, y, color) {
     var _this = this;
 
     (function() {
-        _this.color = color;
         _this.height = char.height;
         _this.width = char.width;
         _this.pos_x = x;
@@ -21,6 +27,11 @@ var Character = function(x, y, color) {
         _this.weight = 200;
         if(typeof state !== 'undefined')
             _this.state = state;
+        if(typeof color !== 'undefined') {
+            _this.color = color;
+        } else {
+            _this.color = getRandomColor();
+        }
     })();
 };
 
@@ -33,7 +44,7 @@ Character.prototype.getPosition = function() {
         acceleration_x: this.acceleration_x,
         acceleration_y: this.acceleration_y
     }
-}
+};
 
 Character.prototype.update = function(increments) {
     this.pos_x = increments.pos_x;
@@ -45,7 +56,7 @@ Character.prototype.update = function(increments) {
 };
 
 module.exports = {
-    'width': width,
-    'height': height,
-    'Character': Character
+    width: width,
+    height: height,
+    Character: Character
 };

@@ -2,7 +2,7 @@
  * Module de gestion de caractère
  */
 
-var mapFactory = require('./mapFactory')
+var mapFactory = require('./mapFactory.js');
 
 var Weapon = function(width, height, velocity, damage) {
     var _this = this;
@@ -92,6 +92,6 @@ WeaponeryManager.prototype.update = function(time_diff) {
 };
 
 module.exports = {
-    'Weapon': Weapon,
-    'WeaponeryManager': WeaponeryManager
+    Weapon: Weapon,
+    WeaponeryManager: WeaponeryManager
 };
