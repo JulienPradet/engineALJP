@@ -7,6 +7,9 @@
 
 engineALJP.controls = {};
 
+engineALJP.controls.doubleActionTime = 500;
+
+
 /**
  * Classe des types d'action - permet d'interfacer les controls de manière plus propre
  * @param type
@@ -47,56 +50,47 @@ engineALJP.controls.actionStarted = new Event("engineALJP_ActionChange");
  * Permet de connaître les touches qui sont actuellement pressées par l'utilisateur
  * @type {Array}
  */
-engineALJP.controls.lastActions = [new engineALJP.controls.Action(""), new engineALJP.controls.Action(""), new engineALJP.controls.Action("")];
-
-/**
- * Index de la dernière action
- * Permet de faire en sorte d'avoir un array a taille fixe et d'accéder aux dernieres actions facilement
- * @type {number}
- */
-engineALJP.controls.lastActionsIndex = -1;
-
-/**
- * Nombre d'action dans l'historique
- * @type {number}
- */
-engineALJP.controls.lastActionsLength = 3;
+engineALJP.controls.lastActions = {
+    'left': new engineALJP.controls.Action('left'),
+    'right': new engineALJP.controls.Action('right'),
+    'top': new engineALJP.controls.Action('top'),
+    'down': new engineALJP.controls.Action('down'),
+    'action': new engineALJP.controls.Action('action')
+};
 
 /**
  * On récupère l'action effectuée il y a n étapes
+ * 0 est l'étape courante
  * @param n
  */
 engineALJP.controls.getAction = function (n) {
-    return engineALJP.controls.lastActions[(engineALJP.controls.lastActionsIndex - n + engineALJP.controls.lastActionsLength) % engineALJP.controls.lastActionsLength];
+    return engineALJP.controls.lastActions.left;
 };
 
 engineALJP.controls.startNewAction = function(type) {
-    var lastAction = engineALJP.controls.getAction(0);
-    if(lastAction.type === type) {
-        lastAction.start(type);
-    } else {
-        engineALJP.controls.lastActions[(++engineALJP.controls.lastActionsIndex + engineALJP.controls.lastActionsLength) % engineALJP.controls.lastActionsLength].start(type);
-    }
+    if(!engineALJP.controls.lastActions[type].ongoing)
+        engineALJP.controls.lastActions[type].start(type);
 };
 
 engineALJP.controls.getLastActionByType = function(type) {
-    var i;
-    for(i = 0; i < engineALJP.controls.lastActionsLength; i++) {
-        if(engineALJP.controls.lastActions[i].type === type && engineALJP.controls.lastActions[i].ongoing) {
-            return engineALJP.controls.lastActions[i];
-        }
+    if(engineALJP.controls.lastActions[type].ongoing) {
+        return engineALJP.controls.lastActions[type];
+    } else {
+        return false;
     }
-    return false;
 };
 
 engineALJP.controls.isOngoing = function(type) {
-    var i, res = false;
-    for(i = 0; !res && i < engineALJP.controls.lastActionsLength; i++) {
-        if(typeof type !== "undefined") {
-            if(type === engineALJP.controls.lastActions[i].type)
-                res = engineALJP.controls.lastActions[i].ongoing;
-        } else {
-            res = engineALJP.controls.lastActions[i].ongoing;
+    var action, res = false;
+    if(typeof type !== "undefined") {
+        action = engineALJP.controls.lastActions[type];
+        if(action.ongoing)
+            return true;
+    } else {
+        var key;
+        for(key in engineALJP.controls.lastActions) {
+            if(engineALJP.controls.lastActions[key].ongoing)
+                return true;
         }
     }
     return res;
@@ -107,8 +101,9 @@ engineALJP.controls.isOngoing = function(type) {
  * @param e
  */
 document.onkeyup = function(e) {
-    var action = engineALJP.controls.getLastActionByType(engineALJP.controls.codeToAction[e.keyCode]);
-    if(action !== false && engineALJP.controls.actionHold[action.type]) {
+//    console.log(engineALJP.controls.codeToAction[e.keyCode]);
+    if(typeof engineALJP.controls.codeToAction[e.keyCode] !== "undefined") {
+        var action = engineALJP.controls.lastActions[engineALJP.controls.codeToAction[e.keyCode]];
         action.stop();
     }
 };

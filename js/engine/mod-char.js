@@ -6,12 +6,15 @@
 
 engineALJP.char = {};
 
+engineALJP.char.width = 16;
+engineALJP.char.height = 16;
+
 engineALJP.char.Character = function(x, y) {
     var _this = this;
 
     (function() {
-        _this.height = 16;
-        _this.width = 16;
+        _this.height = engineALJP.char.height;
+        _this.width = engineALJP.char.width;
         _this.pos_x = x;
         _this.pos_y = y;
         _this.velocity_x = 0;
@@ -44,6 +47,6 @@ engineALJP.char.Character.prototype.update = function(increments) {
     this.acceleration_y = increments.acceleration_y;
 };
 
-engineALJP.char.Character.prototype.draw = function(ctx) {
-    engineALJP.canvasExtension.drawRotatedRectangle(Math.floor(this.pos_x), Math.floor(this.pos_y), 16, 16, 0, '#000000');
+engineALJP.char.Character.prototype.draw = function(ctx, offsetX, offsetY) {
+    engineALJP.canvasExtension.drawRotatedRectangle(this.pos_x - offsetX, this.pos_y - offsetY, 16, 16, 0, '#000000');
 };

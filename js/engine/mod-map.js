@@ -136,16 +136,18 @@ engineALJP.map.Bloc.prototype.deleteBloc = function(map, index) {
  * Fonction qui dessine le bloc en canvas
  * @param ctx Context du canvas où il faut pouvoir dessiner
  */
-engineALJP.map.Bloc.prototype.draw = function(ctx) {
+engineALJP.map.Bloc.prototype.draw = function(ctx, offsetX, offsetY) {
+    var x = this.x - offsetX,
+        y = this.y - offsetY;
     /* On s'assure que le bloc est dans la zone visible */
-    if(this.x + this.width > 0
-        && this.x - this.width < engineALJP.options.width
-        && this.y + this.height > 0
-        && this.y - this.height < engineALJP.options.height) {
+    if(x + this.width > 0
+        && x - this.width < engineALJP.options.width
+        && y + this.height > 0
+        && y - this.height < engineALJP.options.height) {
 
         /* Si c'est une chaine de caractère décrivant une couleur hexadecimale */
         if(typeof this.background === "string" && !!this.background.match(/^#([0-9A-Fa-f]{3}){1,2}/)) {
-            engineALJP.canvasExtension.drawRotatedRectangle(this.x, this.y, this.width, this.height, this.angle, this.background);
+            engineALJP.canvasExtension.drawRotatedRectangle(x, y, this.width, this.height, this.angle, this.background);
 
         /* Si c'est un sprite */
         } else if(this.background instanceof engineALJP.sprite.sprite) {
@@ -175,8 +177,6 @@ engineALJP.map.Map = function(x, y, angle, argBlocs, npcs) {
     (function() {
         _this.pos_x = x;
         _this.pos_y = y;
-        _this.velocity_x = 0;
-        _this.velocity_y = 0;
         _this.angle = angle;
         _this.blocs = argBlocs;
         _this.npcs = npcs;
@@ -187,8 +187,6 @@ engineALJP.map.Map.prototype.getPosition = function() {
     return ({
         pos_x: this.pos_x,
         pos_y: this.pos_y,
-        velocity_x: this.velocity_x,
-        velocity_y: this.velocity_y,
         angle: this.angle
     });
 }
@@ -248,8 +246,6 @@ engineALJP.map.Map.prototype.removeBloc = function(index) {
 engineALJP.map.Map.prototype.update = function(increments) {
     this.pos_x = increments.pos_x;
     this.pos_y = increments.pos_y;
-    this.velocity_x = increments.velocity_x;
-    this.velocity_y = increments.velocity_y;
     this.angle = increments.angle;
 };
 
@@ -257,16 +253,18 @@ engineALJP.map.Map.prototype.update = function(increments) {
  * Fonction qui dessine la map
  * @param ctx Contexte du canvas
  */
-engineALJP.map.Map.prototype.draw = function(ctx) {
+engineALJP.map.Map.prototype.draw = function(ctx, offsetX, offsetY) {
     /* On efface la surface concernée par la map */
-    ctx.save();
-    ctx.translate(Math.floor(this.pos_x) + engineALJP.options.width/2, Math.floor(this.pos_y) + engineALJP.options.height/2);
-    ctx.rotate(this.angle);
-    ctx.translate(- engineALJP.options.width/2, - engineALJP.options.height/2);
+
     ctx.beginPath();
     ctx.rect(0,0,engineALJP.options.width,engineALJP.options.height);
     ctx.fillStyle = "#ffffff";
     ctx.fill();
+
+    ctx.save();
+    ctx.translate(Math.floor(this.pos_x) + engineALJP.options.width/2, Math.floor(this.pos_y) + engineALJP.options.height/2);
+    ctx.rotate(this.angle);
+    ctx.translate(- engineALJP.options.width/2, - engineALJP.options.height/2);
     var i, j,
         length_i, length_j;
     length_i = this.blocs.length;
@@ -274,7 +272,7 @@ engineALJP.map.Map.prototype.draw = function(ctx) {
         length_j = this.blocs[i].length;
         for(j = 0; j < length_j; j++) {
             if(typeof this.blocs[i][j] !== "undefined") {
-                this.blocs[i][j].draw();
+                this.blocs[i][j].draw(ctx, offsetX, offsetY);
             }
         }
     }
