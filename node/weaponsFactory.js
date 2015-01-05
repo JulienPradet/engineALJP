@@ -2,9 +2,9 @@
  * Module de gestion de caractère
  */
 
-engineALJP.weaponery = {};
+var mapFactory = require('./mapFactory')
 
-engineALJP.weaponery.Weapon = function(width, height, velocity, damage) {
+var Weapon = function(width, height, velocity, damage) {
     var _this = this;
 
     (function() {
@@ -16,23 +16,23 @@ engineALJP.weaponery.Weapon = function(width, height, velocity, damage) {
     })();
 };
 
-engineALJP.weaponery.Weapon.prototype.getBullet = function(x, y, velocity) {
+Weapon.prototype.getBullet = function(x, y, velocity) {
     return {
         "velocity_x": velocity.x * 2,
         "velocity_y": velocity.y * 2,
         "damage": this.damage,
         "life": this.life,
-        "bloc": new engineALJP.map.Bloc({
-                x: x,
-                y: y,
-                height: this.height,
-                width: this.width,
-                color: "blue"
-            })
+        "bloc": new mapFactory.Bloc({
+            x: x,
+            y: y,
+            height: this.height,
+            width: this.width,
+            color: "blue"
+        })
     };
 };
 
-engineALJP.weaponery.WeaponeryManager = function() {
+var WeaponeryManager = function() {
     var _this = this;
 
     (function() {
@@ -43,14 +43,14 @@ engineALJP.weaponery.WeaponeryManager = function() {
     })();
 };
 
-engineALJP.weaponery.WeaponeryManager.prototype.addWeapon = function(weapon) {
+WeaponeryManager.prototype.addWeapon = function(weapon) {
     if(weapon instanceof engineALJP.weaponery.Weapon) {
         this.weapons.push(weapon);
         this.currentWeapon = weapon;
     }
 };
 
-engineALJP.weaponery.WeaponeryManager.prototype.fire = function(x, y, velocity) {
+WeaponeryManager.prototype.fire = function(x, y, velocity) {
     if(new Date() - this.lastFire > 250 && this.currentWeapon !== false) {
         this.lastFire = new Date();
         var i, length, created = false;
@@ -67,7 +67,7 @@ engineALJP.weaponery.WeaponeryManager.prototype.fire = function(x, y, velocity) 
     }
 };
 
-engineALJP.weaponery.WeaponeryManager.prototype.update = function(time_diff) {
+WeaponeryManager.prototype.update = function(time_diff) {
     var i = 0,
         length = this.bullets.length,
         bullet, position;
@@ -91,12 +91,7 @@ engineALJP.weaponery.WeaponeryManager.prototype.update = function(time_diff) {
         this.bullets = [];
 };
 
-engineALJP.weaponery.WeaponeryManager.prototype.draw = function(ctx, offsetX, offsetY) {
-    var i = 0,
-        length = this.bullets.length;
-    for(; i < length; i++) {
-        if(this.bullets[i].life > 0) {
-            this.bullets[i].bloc.draw(ctx, offsetX, offsetY);
-        }
-    }
+module.exports = {
+    'Weapon': Weapon,
+    'WeaponeryManager': WeaponeryManager
 };
