@@ -11,8 +11,7 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var actions = require('./actions.js');
 var positions = require('./positions.js');
-
-
+var charFactory = require('./charFactory.js');
 
 /* Gestion de l'affichage de la page : port 8080  */
 

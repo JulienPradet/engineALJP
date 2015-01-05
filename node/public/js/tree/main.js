@@ -17,7 +17,7 @@ for(var i = 0; i < 400 / 16; ++i) {
     treeGame.currentMap.addFixedBlocs(24, i, new engineALJP.map.Bloc({x: 24*16, y: i*16, angle: 0}));
 }
 
-treeGame.mainChar = new engineALJP.char.Character((engineALJP.options.width - engineALJP.char.width)/2, (engineALJP.options.height - engineALJP.char.width)/2);
+treeGame.mainChar = new engineALJP.char.Character((engineALJP.options.width - engineALJP.char.width)/2, (engineALJP.options.height - engineALJP.char.width)/2, '#000000');
 
 treeGame.weaponery = new engineALJP.weaponery.WeaponeryManager();
 treeGame.weaponery.addWeapon(new engineALJP.weaponery.Weapon(4, 4, 2, 100));
