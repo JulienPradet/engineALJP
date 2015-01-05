@@ -44,7 +44,7 @@ var WeaponeryManager = function() {
 };
 
 WeaponeryManager.prototype.addWeapon = function(weapon) {
-    if(weapon instanceof engineALJP.weaponery.Weapon) {
+    if(weapon instanceof Weapon) {
         this.weapons.push(weapon);
         this.currentWeapon = weapon;
     }
