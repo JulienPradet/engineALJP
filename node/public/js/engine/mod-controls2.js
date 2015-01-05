@@ -9,6 +9,8 @@ engineALJP.controls = {};
 
 engineALJP.controls.doubleActionTime = 500;
 
+engineALJP.controls.socket = io();
+
 
 /**
  * Classe des types d'action - permet d'interfacer les controls de manière plus propre
@@ -105,6 +107,12 @@ document.onkeyup = function(e) {
     if(typeof engineALJP.controls.codeToAction[e.keyCode] !== "undefined") {
         var action = engineALJP.controls.lastActions[engineALJP.controls.codeToAction[e.keyCode]];
         action.stop();
+
+        /* On envoie les commandes mise a jour via la socket */
+        engineALJP.controls.socket.emit('action', {
+            'id': 0,
+            'actions': engineALJP.controls.lastActions
+        });
     }
 };
 
@@ -116,8 +124,16 @@ document.onkeydown = function(e) {
     var action = engineALJP.controls.codeToAction[e.keyCode];
     if(typeof action !== "undefined") {
         e.preventDefault();
-        if(false === engineALJP.controls.isOngoing(action))
+        if(false === engineALJP.controls.isOngoing(action)) {
             engineALJP.controls.startNewAction(action);
+
+            /* On envoie les commandes mise a jour via la socket */
+            engineALJP.controls.socket.emit('action', {
+                'id': 0,
+                'actions': engineALJP.controls.lastActions
+            });
+        }
+
     }
 };
 

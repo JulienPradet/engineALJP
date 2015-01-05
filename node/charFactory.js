@@ -12,12 +12,13 @@ var getRandomColor = function() {
     return '#' + parseInt(hexString, 16);
 };
 
-var Character = function(x, y, color) {
+var Character = function(id, x, y, color) {
     var _this = this;
 
     (function() {
-        _this.height = char.height;
-        _this.width = char.width;
+        _this.id = id;
+        _this.height = height;
+        _this.width = width;
         _this.pos_x = x;
         _this.pos_y = y;
         _this.velocity_x = 0;

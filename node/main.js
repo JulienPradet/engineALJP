@@ -13,6 +13,8 @@ var actions = require('./actions.js');
 var positions = require('./positions.js');
 var mapFactory = require('./mapFactory.js');
 var charFactory = require('./charFactory.js');
+var gameServer = require('./server.js'),
+    game = gameServer.initServer();
 
 /* Gestion de l'affichage de la page : port 8080  */
 
@@ -33,11 +35,12 @@ app.get(/\/(js|css)\/(.*)/, function(req, res){
 
 io.on('connection', function(socket){
     /* On crée le personnage */
-
+    var char = game.addCharacter();
+    socket.emit('id', char.id);
 
     /* On ecoute les actions de l'utilisateur */
-    socket.on('action', function(lastActions) {
-
+    socket.on('action', function(charActions) {
+        actions.update(charActions);
     });
 
     /* On gère la déconnexion */

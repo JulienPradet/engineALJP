@@ -173,7 +173,7 @@ Map.prototype.readFromCSV = function(src) {
  */
 Map.prototype.addFixedBlocs = function(x, y, bloc) {
     /* S'il s'agit d'un bloc unique */
-    if(bloc instanceof engineALJP.map.Bloc) {
+    if(bloc instanceof Bloc) {
         if(typeof this.blocs[x] === "undefined")
             this.blocs[x] = [];
         this.blocs[x][y] = bloc;
