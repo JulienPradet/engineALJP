@@ -1,0 +1,12 @@
+/* Canvas */
+canvas.getContext(); /* Récupère l'objet qui permet de dessiner en canvas avec du JS */
+
+/* Document */
+document.createElement(balise); /* Crée un element du DOM */
+document.getElementById(id); /* Recupere un element du DOM via son ID */
+
+/* Elements */
+element.appendChild(element); /* Ajout un element DOM a la fin d'un autre */
+
+/* String */
+string.match(); /* Teste si une chaine vérifie une expression régulière et renvoie le résultat */
