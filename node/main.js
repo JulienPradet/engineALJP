@@ -4,16 +4,19 @@
 * Ecoute de nouvelles websockets
 * */
 
-/* Gestion de l'affichage de la page : port 8080 */
+/* Inclusions */
+
 var app = require('express')();
-/* Gestion des sockets */
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
+var actions = require('./actions.js');
+var positions = require('./positions.js');
 
 
+
+/* Gestion de l'affichage de la page : port 8080  */
 
 app.get('/', function(req, res){
-    console.log("route1");
     res.sendFile('/index.html', {root: 'public'});
 });
 
@@ -21,10 +24,12 @@ app.get(/\/(js|css)\/(.*)/, function(req, res){
     var route = '/' + req.params[0] + '/' + req.params[1];
     if(route === "") route = "/index.html";
 
-    console.log("route2"+route);
-
     res.sendFile(route, {root: 'public'});
 });
+
+
+
+/* Gestion des sockets */
 
 io.on('connection', function(socket){
     /* On crée le personnage */
