@@ -30,7 +30,7 @@ io.on('connection', function(socket){
     console.log('a user connected');
 });
 
-var server = app.listen(8080, function(){
+var server = http.listen(8080, function(){
 
     var host = server.address().address;
     var port = server.address().port;
