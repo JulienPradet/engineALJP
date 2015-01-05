@@ -9,8 +9,6 @@ engineALJP.controls = {};
 
 engineALJP.controls.doubleActionTime = 500;
 
-engineALJP.controls.socket = io();
-
 
 /**
  * Classe des types d'action - permet d'interfacer les controls de manière plus propre
@@ -109,7 +107,7 @@ document.onkeyup = function(e) {
         action.stop();
 
         /* On envoie les commandes mise a jour via la socket */
-        engineALJP.controls.socket.emit('action', {
+        engineALJP.socket.emit('action', {
             'id': 0,
             'actions': engineALJP.controls.lastActions
         });
@@ -128,7 +126,7 @@ document.onkeydown = function(e) {
             engineALJP.controls.startNewAction(action);
 
             /* On envoie les commandes mise a jour via la socket */
-            engineALJP.controls.socket.emit('action', {
+            engineALJP.socket.emit('action', {
                 'id': 0,
                 'actions': engineALJP.controls.lastActions
             });

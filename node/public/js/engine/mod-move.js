@@ -295,4 +295,17 @@ engineALJP.move.Manager.prototype.initEventsListeners = function() {
     document.addEventListener("engineALJP_ActionChange", function() {
         _this.begin();
     });
-}
+};
+
+engineALJP.move.Manager.prototype.updatePositions = function(newPositions) {
+    for (var i=0; i<newPositions.length; ++i) {
+        if (newPositions[i].type === "char") {
+            console.log("Je vais mettre à jour un character.");
+            //TODO
+        }
+        if (newPositions[i].type === "bullet") {
+            console.log("Je vais mettre à jour un bullet.");
+            //TODO
+        }
+    }
+};

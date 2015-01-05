@@ -43,6 +43,16 @@ io.on('connection', function(socket){
         actions.update(charActions);
     });
 
+    var positionsChanged = true;
+    var newPositions = [{type: "char", id:0, position:{pos_x: 10, pos_y:20}}];
+
+    /* On regarde toutes les 60ms s'il y a des éléments qui ont bougé pour prévenir les clients */
+    setInterval(function() {
+        if (positionsChanged) {
+            io.emit('newPositions', newPositions);
+        }
+    }, 1000/60);
+
     /* On gère la déconnexion */
     socket.on('disconnect', function() {
 
