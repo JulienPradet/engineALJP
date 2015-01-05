@@ -250,7 +250,7 @@ engineALJP.move.Manager.prototype.drawLoop = function() {
     /* Affichage de la nouvelle frame */
     this.frame();
 
-    /* Continue l'affichage */
+    /* Continue l'affichage dès qu'il peut (fonction optimisée par le navigateur) */
     requestAnimationFrame(function() {
         _this.drawLoop();
     });
