@@ -230,7 +230,6 @@ engineALJP.move.Manager.prototype.animate = function() {
 
 /**
  * Calcul de la nouvelle frame
- * @param increments update du mouvement
  */
 engineALJP.move.Manager.prototype.frame = function() {
     /* Maj de la carte */
