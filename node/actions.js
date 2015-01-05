@@ -1,0 +1,1 @@
+/* Gestion de la socket qui écoute les changements de position de l'utilisateur */
