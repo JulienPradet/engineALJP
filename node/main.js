@@ -27,7 +27,18 @@ app.get(/\/(js|css)\/(.*)/, function(req, res){
 });
 
 io.on('connection', function(socket){
-    console.log('a user connected');
+    /* On crée le personnage */
+
+
+    /* On ecoute les actions de l'utilisateur */
+    socket.on('action', function(lastActions) {
+
+    });
+
+    /* On gère la déconnexion */
+    socket.on('disconnect', function() {
+
+    });
 });
 
 var server = http.listen(8080, function(){
