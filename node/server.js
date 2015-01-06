@@ -5,6 +5,7 @@
 var mapFactory = require('./mapFactory.js'),
     weaponsFactory = require('./weaponsFactory.js'),
     charFactory = require('./charFactory.js'),
+    gamerFactory = require('./gamerFactory.js'),
     io;
 
 /* Gestion de la socket qui écoute les changements de position de l'utilisateur */
@@ -186,20 +187,9 @@ Game.prototype.update = function() {
 };
 
 Game.prototype.addGamer = function() {
-    var gamer = new Gamer(this.gamers.length);
+    var gamer = new gamerFactory.Gamer(this.gamers.length);
     this.gamers.push(gamer);
     return gamer;
-};
-
-var Gamer = function(id) {
-    var _this = this;
-
-    (function() {
-        _this.id = id;
-        _this.nickname = "Guest"+(Math.floor(Math.random()*1000));
-        _this.lastMove = new Date();
-        _this.char = new charFactory.Character(id, 0, 0);
-    })();
 };
 
 function initServer() {
