@@ -7,10 +7,11 @@ engineALJP.char = {};
 engineALJP.char.width = 16;
 engineALJP.char.height = 16;
 
-engineALJP.char.Character = function(x, y, color) {
+engineALJP.char.Character = function(id, x, y, color) {
     var _this = this;
 
     (function() {
+        _this.id = id;
         _this.color = color;
         _this.height = engineALJP.char.height;
         _this.width = engineALJP.char.width;

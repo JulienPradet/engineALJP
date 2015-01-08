@@ -194,6 +194,13 @@ BroadcastManager.prototype.move = function(positionChanged, newPositions) {
     }
 };
 
+BroadcastManager.prototype.addGamer = function(gamer) {
+    io.emit('addGamer', gamer);
+};
+
+BroadcastManager.prototype.deleteGamer = function(id) {
+    io.emit('deleteGamer', id);
+};
 
 var Game = function() {
     var _this = this;
@@ -232,17 +239,24 @@ Game.prototype.close = function() {
 
 Game.prototype.update = function() {
     var _this = this;
+
+    /* Toutes les 60ms on envoie les positions */
     setInterval(function() {
         _this.broadcast.move(_this.actionManager.positionChanged, _this.actionManager.newPositions);
     }, 1000/60);
 
     io.on('connection', function(socket){
-        /* On crée le personnage */
+        /* On envoie le tableau des joueurs pré-existants au nouveau connecté */
+        socket.emit('gamers', _this.gamers);
+        /* On crée le joueur et on prévient tout le monde */
         var gamer = _this.addGamer();
+        _this.broadcast.addGamer(gamer);
+        /* On dit au nouveau connecté quel joueur il est */
         socket.emit('id', gamer.id);
 
-        /* On ecoute les actions de l'utilisateur */
+        /* On écoute les actions de l'utilisateur */
         socket.on('action', function(charActions) {
+            console.log(_this.gamers[charActions.id]);
             _this.actionManager.setGamerToUpdate(
                 charActions.id,
                 charActions.actions,
@@ -250,14 +264,13 @@ Game.prototype.update = function() {
                 _this.gamers[charActions.id].char
             );
             _this.actionManager.update();
-
-//            _this.gamers[charActions.id].char.update(increments.position);
-//            _this.gamers[charActions.id].lastMove = increments.lastMove;
         });
 
         /* On gère la déconnexion */
         socket.on('disconnect', function() {
-
+            /* On supprime le joueur et on prévient tout le monde */
+            _this.deleteGamer(gamer.id);
+            _this.broadcast.deleteGamer(gamer.id);
         });
     });
 };
@@ -266,6 +279,10 @@ Game.prototype.addGamer = function() {
     var gamer = new gamerFactory.Gamer(this.gamers.length);
     this.gamers.push(gamer);
     return gamer;
+};
+
+Game.prototype.deleteGamer = function(id) {
+    delete this.gamers[id];
 };
 
 function initServer() {

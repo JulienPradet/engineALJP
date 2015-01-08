@@ -106,7 +106,7 @@ document.onkeyup = function(e) {
         var action = engineALJP.controls.lastActions[engineALJP.controls.codeToAction[e.keyCode]];
         action.stop();
 
-        /* On envoie les commandes mise a jour via la socket */
+        /* On envoie les commandes mises à jour via la socket */
         engineALJP.socket.emit('action', {
             'id': 0,
             'actions': engineALJP.controls.lastActions
@@ -125,7 +125,7 @@ document.onkeydown = function(e) {
         if(false === engineALJP.controls.isOngoing(action)) {
             engineALJP.controls.startNewAction(action);
 
-            /* On envoie les commandes mise a jour via la socket */
+            /* On envoie les commandes mises à jour via la socket */
             engineALJP.socket.emit('action', {
                 'id': 0,
                 'actions': engineALJP.controls.lastActions

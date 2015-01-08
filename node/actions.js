@@ -39,7 +39,7 @@ var ActionManager = function() {
                 _this.increments.character.velocity_y = 0;
             },
             "action": function(_this, time_diff) {
-                // On tire
+                /* On tire */
                 weaponery.fire(
                     _this.increments.character.pos_x + 8,
                     _this.increments.character.pos_y + 8,

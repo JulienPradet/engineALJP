@@ -5,19 +5,19 @@
 var width = 16;
 var height = 16;
 
-var getRandomColorComposant = function() {
+var getRandomColorComponent = function() {
     /* On génére un entier aléatoire compris entre 0 inclus et 256 exclus puis on convertit en hexadécimal */
-    var alea = Math.floor(Math.random() * 256);
-    var composant = alea.toString(16);
+    var rand = Math.floor(Math.random() * 256);
+    var component = rand.toString(16);
 
-    if (composant.length < 2)
-        composant = '0' + composant;
+    if (component.length < 2)
+        component = '0' + component;
 
-    return composant;
+    return component;
 };
 
 var getRandomColor = function() {
-    return "#" + getRandomColorComposant() + getRandomColorComposant() + getRandomColorComposant();
+    return "#" + getRandomColorComponent() + getRandomColorComponent() + getRandomColorComponent();
 };
 
 var Character = function(id, x, y, color) {
