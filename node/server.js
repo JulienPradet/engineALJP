@@ -17,6 +17,7 @@ var ActionManager = function(weaponery) {
         _this.weaponery = weaponery;
         _this.positionChanged = false;
         _this.newPositions = [];
+        _this.ongoing = false;
 
         _this.actionToIncrement = {
             "left": function(_this, time_diff, increments) {
@@ -41,17 +42,20 @@ var ActionManager = function(weaponery) {
             },
             "static": function(_this, time_diff, increments) {
                 increments.velocity_x = 0;
-                increments.hasChanged = true;
+                increments.velocity_y = 0;
+                increments.hasChanged = false;
                 return increments;
             },
             "physicMove": function(_this, time_diff, increments) {
                 increments.pos_x = increments.pos_x + increments.velocity_x * time_diff / 1000 * 60;
                 increments.pos_y = increments.pos_y + increments.velocity_y * time_diff / 1000 * 60;
                 increments.hasChanged = true;
+                return increments;
             },
             "init": function(_this, time_diff, increments) {
                 increments.velocity_x = 0;
                 increments.velocity_y = 0;
+                increments.hasChanged = false;
                 return increments
             },
             "action": function(_this, time_diff, increments) {
@@ -145,7 +149,7 @@ ActionManager.prototype.update = function() {
             var id, gamer;
             for(id in _this.gamersToUpdate) {
                 gamer = _this.gamersToUpdate[id];
-                var increments = this.updateGamer(id);
+                var increments = _this.updateGamer(id);
                 if(increments.hasChanged) {
                     positionChanged = true;
                     newPositions.push({
@@ -165,9 +169,20 @@ ActionManager.prototype.update = function() {
 //            for(id in )
 
             /* On fait affiche l'ensemble des modifs au sommet */
-            this.positionChanged = positionChanged;
-            this.newPositions = newPositions;
+            _this.positionChanged = positionChanged;
+            _this.newPositions = newPositions;
+
+            if(positionChanged) {
+                setTimeout(function() {
+                    step(new Date());
+                }, 200);
+            } else {
+                this.ongoing = false;
+            }
         }
+
+        this.ongoing = true;
+        step(new Date());
     }
 };
 
@@ -178,7 +193,6 @@ var BroadcastManager = function() {
 BroadcastManager.prototype.move = function(positionChanged, newPositions) {
     if(positionChanged) {
         io.emit('newPositions', newPositions);
-        positionChanged = false;
     }
 };
 
@@ -231,14 +245,16 @@ Game.prototype.update = function() {
 
         /* On ecoute les actions de l'utilisateur */
         socket.on('action', function(charActions) {
-            var increments = _this.actionManager.updateGamer(
+            _this.actionManager.setGamerToUpdate(
                 charActions.id,
                 charActions.actions,
                 _this.gamers[charActions.id].lastMove,
                 _this.gamers[charActions.id].char
             );
-            _this.gamers[charActions.id].char.update(increments.position);
-            _this.gamers[charActions.id].lastMove = increments.lastMove;
+            _this.actionManager.update();
+
+//            _this.gamers[charActions.id].char.update(increments.position);
+//            _this.gamers[charActions.id].lastMove = increments.lastMove;
         });
 
         /* On gère la déconnexion */
