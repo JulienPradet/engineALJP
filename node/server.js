@@ -8,6 +8,12 @@ var mapFactory = require('./mapFactory.js'),
     gamerFactory = require('./gamerFactory.js'),
     io;
 
+
+
+
+
+/* ActionManager */
+
 /* Gestion de la socket qui écoute les changements de position de l'utilisateur */
 var ActionManager = function(weaponery) {
     var _this = this;
@@ -208,10 +214,50 @@ ActionManager.prototype.update = function() {
     }
 };
 
+
+
+
+
+/* GamerManager */
+
+var GamerManager = function() {
+    var _this = this;
+
+    (function() {
+        _this.gamers = [];
+    })();
+};
+
+GamerManager.prototype.addGamer = function() {
+    var gamer = new gamerFactory.Gamer(this.gamers.length);
+    this.gamers.push(gamer);
+    return gamer;
+};
+
+GamerManager.prototype.deleteGamer = function(id) {
+    delete this.gamers[id];
+};
+
+GamerManager.prototype.updatePositions = function(newPositions) {
+    for(var id in newPositions) {
+        var change = newPositions[id];
+        if(change.type === 'char') {
+            this.gamers[change.id].pos_x = change.position.pos_x;
+            this.gamers[change.id].pos_y = change.position.pos_y;
+            this.gamers[change.id].lastMove = change.lastMove;
+        }
+    }
+};
+
+
+
+
+
+/* BroadcastManager */
+
 var BroadcastManager = function() {};
 
 BroadcastManager.prototype.move = function(newPositions) {
-    /* On le dit à l'ensemble des personnes connectées */
     io.emit('newPositions', newPositions);
 };
 
@@ -222,6 +268,12 @@ BroadcastManager.prototype.addGamer = function(gamer) {
 BroadcastManager.prototype.deleteGamer = function(id) {
     io.emit('deleteGamer', id);
 };
+
+
+
+
+
+/* Game */
 
 var Game = function() {
     var _this = this;
@@ -245,7 +297,7 @@ var Game = function() {
         _this.weaponery.addWeapon(new weaponsFactory.Weapon(4, 4, 2, 100));
 
         /* Gestion des joueurs */
-        _this.gamers = [];
+        _this.gamerManager = new GamerManager();
     })();
 };
 
@@ -266,33 +318,22 @@ Game.prototype.update = function() {
         if(_this.actionManager.positionChanged) {
             _this.broadcast.move(_this.actionManager.newPositions);
 
-//            Mettre a jour la position de l'ensemble des positions coté modele du serveur
-//            _this.gamerManager.updatePositions(_this.actionManager.newPositions);
-
-            var id, gamer;
-            for(id in _this.actionManager.newPositions) {
-                var change = _this.actionManager.newPositions[id];
-                if(change.type === 'char') {
-                    _this.gamers[change.id].pos_x = change.position.pos_x;
-                    _this.gamers[change.id].pos_y = change.position.pos_y;
-                    _this.gamers[change.id].lastMove = change.lastMove;
-                }
-            }
+            /* On met à jour la position de l'ensemble des positions coté modèle du serveur */
+            _this.gamerManager.updatePositions(_this.actionManager.newPositions);
         }
     }, 1000/60);
 
     io.on('connection', function(socket){
         /* On envoie le tableau des joueurs pré-existants au nouveau connecté */
-        socket.emit('gamers', _this.gamers);
+        socket.emit('gamers', _this.gamerManager.gamers);
         /* On crée le joueur et on prévient tout le monde */
-        var gamer = _this.addGamer();
+        var gamer = _this.gamerManager.addGamer();
         _this.broadcast.addGamer(gamer);
         /* On dit au nouveau connecté quel joueur il est */
         socket.emit('id', gamer.id);
 
         /* On écoute les actions de l'utilisateur */
         socket.on('action', function(charActions) {
-            console.log("idmove"+charActions.id);
             _this.actionManager.setGamerToUpdate(
                 charActions.id,
                 charActions.actions,
@@ -305,24 +346,17 @@ Game.prototype.update = function() {
         /* On gère la déconnexion */
         socket.on('disconnect', function() {
             /* On supprime le joueur et on prévient tout le monde */
-            _this.deleteGamer(gamer.id);
+            _this.gamerManager.deleteGamer(gamer.id);
             _this.broadcast.deleteGamer(gamer.id);
         });
     });
 };
 
-Game.prototype.addGamer = function() {
-    console.log("gamers"+this.gamers);
-    console.log("length"+this.gamers.length);
-    var gamer = new gamerFactory.Gamer(this.gamers.length);
-    this.gamers.push(gamer);
-    console.log("id"+gamer.id);
-    return gamer;
-};
 
-Game.prototype.deleteGamer = function(id) {
-    delete this.gamers[id];
-};
+
+
+
+/* Initialisation et export */
 
 function initServer() {
     var game = new Game();

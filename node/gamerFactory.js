@@ -16,5 +16,5 @@ var Gamer = function(id) {
 };
 
 module.exports = {
-    Gamer: Gamer
+        Gamer: Gamer
 };
