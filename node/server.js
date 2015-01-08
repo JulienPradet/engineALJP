@@ -9,105 +9,166 @@ var mapFactory = require('./mapFactory.js'),
     io;
 
 /* Gestion de la socket qui écoute les changements de position de l'utilisateur */
-var ActionManager = function() {
+var ActionManager = function(weaponery) {
     var _this = this;
 
     (function() {
+        _this.gamersToUpdate = {};
+        _this.weaponery = weaponery;
         _this.positionChanged = false;
         _this.newPositions = [];
-        _this.increments = {};
 
         _this.actionToIncrement = {
-            "left": function(_this, time_diff) {
-                _this.increments.velocity_x = -1;
-                return true;
+            "left": function(_this, time_diff, increments) {
+                increments.velocity_x = -1;
+                increments.hasChanged = true;
+                return increments;
             },
-            "right": function(_this, time_diff) {
-                _this.increments.velocity_x = 1;
-                return true;
+            "right": function(_this, time_diff, increments) {
+                increments.velocity_x = 1;
+                increments.hasChanged = true;
+                return increments;
             },
-            "top": function(_this, time_diff) {
-                _this.increments.velocity_y = -1;
-                return true;
+            "top": function(_this, time_diff, increments) {
+                increments.velocity_y = -1;
+                increments.hasChanged = true;
+                return increments;
             },
-            "down": function(_this, time_diff) {
-                _this.increments.velocity_y = 1;
-                return true;
+            "down": function(_this, time_diff, increments) {
+                increments.velocity_y = 1;
+                increments.hasChanged = true;
+                return increments;
             },
-            "static": function(_this, time_diff) {
-                _this.increments.velocity_x = 0;
-                return false;
+            "static": function(_this, time_diff, increments) {
+                increments.velocity_x = 0;
+                increments.hasChanged = true;
+                return increments;
             },
-            "physicMove": function(_this, time_diff) {
-                _this.increments.pos_x = _this.increments.pos_x + _this.increments.velocity_x * time_diff / 1000 * 60;
-                _this.increments.pos_y = _this.increments.pos_y + _this.increments.velocity_y * time_diff / 1000 * 60;
+            "physicMove": function(_this, time_diff, increments) {
+                increments.pos_x = increments.pos_x + increments.velocity_x * time_diff / 1000 * 60;
+                increments.pos_y = increments.pos_y + increments.velocity_y * time_diff / 1000 * 60;
+                increments.hasChanged = true;
             },
-            "init": function(_this, time_diff) {
-                _this.increments.velocity_x = 0;
-                _this.increments.velocity_y = 0;
+            "init": function(_this, time_diff, increments) {
+                increments.velocity_x = 0;
+                increments.velocity_y = 0;
+                return increments
             },
-            "action": function(_this, time_diff) {
+            "action": function(_this, time_diff, increments) {
                 // On tire
-                weaponery.fire(
-                    _this.increments.pos_x + 8,
-                    _this.increments.character.pos_y + 8,
+                this.weaponery.fire(
+                    increments.pos_x + 8,
+                    increments.character.pos_y + 8,
                     {
-                        x: _this.increments.velocity_x,
-                        y: _this.increments.velocity_y
+                        x: increments.velocity_x,
+                        y: increments.velocity_y
                     }
                 );
+                increments.hasChanged = true;
+                return increments
             }
         };
     })();
 };
 
-ActionManager.prototype.getIncrements = function(id, actions, time_diff) {
-    this.positionChanged = false;
+ActionManager.prototype.getIncrements = function(id, actions, time_diff, increments) {
     /* On les calcule pour un jeu de plateforme */
     var useStep = false,
         i, action;
-    this.actionToIncrement.init(this, time_diff);
+
+    increments = this.actionToIncrement.init(this, time_diff, increments);
+
     for(i in actions) {
         action = actions[i];
         if(action.ongoing) {
-            useStep = this.actionToIncrement[action.type](this, time_diff) || useStep;
+            increments = this.actionToIncrement[action.type](this, time_diff, increments);
         }
     }
 
-    if(useStep) {
-        this.actionToIncrement.physicMove(this, time_diff);
-        this.positionChanged = true;
-
-        if(this.positionChanged) {
-            this.newPositions.push({
-                'type': 'char',
-                'id': id,
-                'position': {
-                    'pos_x': this.increments.pos_x,
-                    'pos_y': this.increments.pos_y
-                }
-            });
-        }
+    if(increments.hasChanged) {
+        increments = this.actionToIncrement.physicMove(this, time_diff, increments);
+        this.newPositions.push({
+            'type': 'char',
+            'id': id,
+            'position': {
+                'pos_x': increments.pos_x,
+                'pos_y': increments.pos_y
+            }
+        });
     } else {
-        this.actionToIncrement.static(this, time_diff);
+        this.actionToIncrement.static(this, time_diff, increments);
     }
 
-    return useStep;
+    return increments;
 };
 
-ActionManager.prototype.updateGamer = function(id, actions, lastMove, character) {
-    this.increments = character.getPosition();
+ActionManager.prototype.updateGamer = function(id) {
+    var increments = this.gamersToUpdate[id].character.getPosition();
 
     var timestamp = new Date(),
-        time_diff = timestamp - lastMove;
+        time_diff = timestamp - this.gamersToUpdate[id].lastMove;
 
     /* Déplacement du personnage */
-    this.getIncrements(id, actions, time_diff);
+    return this.getIncrements(id, this.gamersToUpdate[id].actions, time_diff, increments);
+};
 
-    return {
-        position: this.increments,
-        lastMove: timestamp
+/* Définition de joueur à mettre a jour*/
+ActionManager.prototype.setGamerToUpdate = function(id, actions, lastMove, character) {
+    this.gamersToUpdate[id] = {
+        id: id,
+        actions: actions,
+        lastMove: lastMove,
+        character: character
     };
+};
+
+/* Fin de mise a jour de joueur */
+ActionManager.prototype.removeGamerToUpdate = function(id) {
+    if(typeof this.gamersToUpdate[id] !== "undefined") {
+        delete this.gamersToUpdate[id];
+    }
+};
+
+/* Mise a jour des positions en continu */
+ActionManager.prototype.update = function() {
+    if(this.ongoing !== true) {
+        /* Etape d'update */
+        var start,
+            useStep = false,
+            _this = this;
+
+        function step(timestamp) {
+            var positionChanged = false,
+                newPositions = [];
+
+            /* Mise a jour des personnages */
+            var id, gamer;
+            for(id in _this.gamersToUpdate) {
+                gamer = _this.gamersToUpdate[id];
+                var increments = this.updateGamer(id);
+                if(increments.hasChanged) {
+                    positionChanged = true;
+                    newPositions.push({
+                        type: 'char',
+                        id: id,
+                        position: {
+                            pos_x: increments.pos_x,
+                            pos_y: increments.pos_y
+                        }
+                    });
+                } else {
+                    _this.removeGamerToUpdate(id);
+                }
+            }
+
+            /* Mise a jour des tirs */
+//            for(id in )
+
+            /* On fait affiche l'ensemble des modifs au sommet */
+            this.positionChanged = positionChanged;
+            this.newPositions = newPositions;
+        }
+    }
 };
 
 var BroadcastManager = function() {
@@ -117,6 +178,7 @@ var BroadcastManager = function() {
 BroadcastManager.prototype.move = function(positionChanged, newPositions) {
     if(positionChanged) {
         io.emit('newPositions', newPositions);
+        positionChanged = false;
     }
 };
 
@@ -149,7 +211,7 @@ var Game = function() {
 
 Game.prototype.init = function() {
     this.broadcast = new BroadcastManager();
-    this.actionManager = new ActionManager();
+    this.actionManager = new ActionManager(this.weaponery);
 };
 
 Game.prototype.close = function() {

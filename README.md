@@ -84,3 +84,7 @@ Ainsi, ca nous donne :
     engineALJP.nomDuModule.maClassFille.prototype.nomFonction2 = function() {
         ...
     };
+
+
+# Les points à réfléchir
+On envoie au client chaque changement. Cependant, s'il en loupe un, qu'est ce que ca engendre ? Grave ?
