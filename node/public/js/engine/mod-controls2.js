@@ -131,7 +131,6 @@ document.onkeydown = function(e) {
                 'actions': engineALJP.controls.lastActions
             });
         }
-
     }
 };
 

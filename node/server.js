@@ -127,7 +127,7 @@ ActionManager.prototype.setGamerToUpdate = function(id, actions, lastMove, chara
     this.gamersToUpdate[id] = {
         id: id,
         actions: actions,
-        lastMove: lastMove,
+        lastMove: new Date(),
         character: character
     };
 };
@@ -144,7 +144,7 @@ ActionManager.prototype.update = function() {
     if(this.ongoing !== true) {
         /* Etape d'update */
         var _this = this,
-            start;
+            start = new Date();
 
         function step(timestamp) {
             console.log("new step!");
@@ -242,8 +242,7 @@ GamerManager.prototype.updatePositions = function(newPositions) {
     for(var id in newPositions) {
         var change = newPositions[id];
         if(change.type === 'char') {
-            this.gamers[change.id].pos_x = change.position.pos_x;
-            this.gamers[change.id].pos_y = change.position.pos_y;
+            this.gamers[change.id].setPosition(change.position);
             this.gamers[change.id].lastMove = change.lastMove;
         }
     }
@@ -337,8 +336,8 @@ Game.prototype.update = function() {
             _this.actionManager.setGamerToUpdate(
                 charActions.id,
                 charActions.actions,
-                _this.gamers[charActions.id].lastMove,
-                _this.gamers[charActions.id].char
+                _this.gamerManager.gamers[charActions.id].lastMove,
+                _this.gamerManager.gamers[charActions.id].char
             );
             _this.actionManager.update();
         });

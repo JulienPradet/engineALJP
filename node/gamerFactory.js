@@ -15,6 +15,10 @@ var Gamer = function(id) {
     })();
 };
 
+Gamer.prototype.setPosition = function(position) {
+    this.char.setPosition(position);
+};
+
 module.exports = {
         Gamer: Gamer
 };

@@ -64,6 +64,11 @@ Character.prototype.update = function(increments) {
     this.acceleration_y = increments.acceleration_y;
 };
 
+Character.prototype.setPosition = function(position) {
+    this.pos_x = position.pos_x;
+    this.pos_y = position.pos_y;
+};
+
 module.exports = {
     width: width,
     height: height,

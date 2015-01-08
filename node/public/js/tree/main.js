@@ -26,6 +26,6 @@ engineALJP.startGame = function() {
     treeGame.weaponery.addWeapon(new engineALJP.weaponery.Weapon(4, 4, 2, 100));
 
     /* On commence l'animation */
-    treeGame.moveManager = new engineALJP.move.Manager(treeGame.currentMap, treeGame.gamers[treeGame.mainId].char, treeGame.weaponery);
+    treeGame.moveManager = new engineALJP.move.Manager(treeGame.currentMap, treeGame.gamers, treeGame.weaponery);
     treeGame.moveManager.initEventsListeners();
 };

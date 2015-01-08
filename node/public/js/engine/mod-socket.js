@@ -9,7 +9,7 @@ engineALJP.socket.on('newPositions', function(newPositions){
 });
 
 engineALJP.socket.on('gamers', function(gamers) {
-    treeGame.gamers = [];
+    treeGame.gamers = new engineALJP.GamerManager([]);
 
     for (var i=0; i<gamers.length; ++i) {
         var gamer = gamers[i];
@@ -18,16 +18,7 @@ engineALJP.socket.on('gamers', function(gamers) {
             continue;
         }
 
-        treeGame.gamers[gamer.id] = new engineALJP.Gamer(
-            gamer.id,
-            gamer.nickname,
-            gamer.lastMove,
-            new engineALJP.char.Character(
-                gamer.id,
-                gamer.char.pos_x,
-                gamer.char.pos_y,
-                gamer.char.color));
-        treeGame.gamers[gamer.id].char.draw();
+        treeGame.gamers.addGamer(gamer);
     }
 });
 
@@ -37,10 +28,10 @@ engineALJP.socket.on('id', function(id) {
 });
 
 engineALJP.socket.on('addGamer', function(gamer) {
-    treeGame.gamers[gamer.id] = gamer;
+    treeGame.gamers.addGamer(gamer);
 });
 
 engineALJP.socket.on('deleteGamer', function(id) {
-    delete treeGame.gamers[id];
+    treeGame.gamers.deleteGamer(id);
 });
 
