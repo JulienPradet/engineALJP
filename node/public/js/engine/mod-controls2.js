@@ -108,7 +108,7 @@ document.onkeyup = function(e) {
 
         /* On envoie les commandes mises à jour via la socket */
         engineALJP.socket.emit('action', {
-            'id': 0,
+            'id': treeGame.mainId,
             'actions': engineALJP.controls.lastActions
         });
     }
@@ -127,7 +127,7 @@ document.onkeydown = function(e) {
 
             /* On envoie les commandes mises à jour via la socket */
             engineALJP.socket.emit('action', {
-                'id': 0,
+                'id': treeGame.mainId,
                 'actions': engineALJP.controls.lastActions
             });
         }

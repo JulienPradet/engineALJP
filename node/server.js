@@ -159,6 +159,7 @@ ActionManager.prototype.update = function() {
                     newPositions.push({
                         type: 'char',
                         id: id,
+                        lastMove: timestamp,
                         position: {
                             pos_x: increments.pos_x,
                             pos_y: increments.pos_y
@@ -171,7 +172,7 @@ ActionManager.prototype.update = function() {
 
             /* Mise a jour des tirs */
             var time_diff = timestamp - start;
-            positionChanged = _this.weaponery.update(time_diff);
+            positionChanged = _this.weaponery.update(time_diff) || positionChanged;
 
 //            var bloc, bulletsToSend = [];
 //            for(id in _this.weaponery.bullets) {
@@ -209,7 +210,7 @@ ActionManager.prototype.update = function() {
 
 var BroadcastManager = function() {};
 
-BroadcastManager.prototype.move = function(positionChanged, newPositions) {
+BroadcastManager.prototype.move = function(newPositions) {
     /* On le dit à l'ensemble des personnes connectées */
     io.emit('newPositions', newPositions);
 };
@@ -265,8 +266,18 @@ Game.prototype.update = function() {
         if(_this.actionManager.positionChanged) {
             _this.broadcast.move(_this.actionManager.newPositions);
 
-            // Mettre a jour la position de l'ensemble des positions coté modele du serveur
+//            Mettre a jour la position de l'ensemble des positions coté modele du serveur
 //            _this.gamerManager.updatePositions(_this.actionManager.newPositions);
+
+            var id, gamer;
+            for(id in _this.actionManager.newPositions) {
+                var change = _this.actionManager.newPositions[id];
+                if(change.type === 'char') {
+                    _this.gamers[change.id].pos_x = change.position.pos_x;
+                    _this.gamers[change.id].pos_y = change.position.pos_y;
+                    _this.gamers[change.id].lastMove = change.lastMove;
+                }
+            }
         }
     }, 1000/60);
 
@@ -281,7 +292,7 @@ Game.prototype.update = function() {
 
         /* On écoute les actions de l'utilisateur */
         socket.on('action', function(charActions) {
-            console.log(_this.gamers[charActions.id]);
+            console.log("idmove"+charActions.id);
             _this.actionManager.setGamerToUpdate(
                 charActions.id,
                 charActions.actions,
@@ -301,8 +312,11 @@ Game.prototype.update = function() {
 };
 
 Game.prototype.addGamer = function() {
+    console.log("gamers"+this.gamers);
+    console.log("length"+this.gamers.length);
     var gamer = new gamerFactory.Gamer(this.gamers.length);
     this.gamers.push(gamer);
+    console.log("id"+gamer.id);
     return gamer;
 };
 
