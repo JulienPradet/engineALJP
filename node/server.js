@@ -137,11 +137,9 @@ ActionManager.prototype.removeGamerToUpdate = function(id) {
 ActionManager.prototype.update = function() {
     if(this.ongoing !== true) {
         /* Etape d'update */
-        var start,
-            useStep = false,
-            _this = this;
+        var _this = this;
 
-        function step(timestamp) {
+        function step() {
             var positionChanged = false,
                 newPositions = [];
 
@@ -174,10 +172,10 @@ ActionManager.prototype.update = function() {
 
             if(positionChanged) {
                 setTimeout(function() {
-                    step(new Date());
+                    step();
                 }, 200);
             } else {
-                this.ongoing = false;
+                _this.ongoing = false;
             }
         }
 
