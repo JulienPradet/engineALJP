@@ -60,9 +60,9 @@ var ActionManager = function(weaponery) {
             },
             "action": function(_this, time_diff, increments) {
                 // On tire
-                this.weaponery.fire(
+                _this.weaponery.fire(
                     increments.pos_x + 8,
-                    increments.character.pos_y + 8,
+                    increments.pos_y + 8,
                     {
                         x: increments.velocity_x,
                         y: increments.velocity_y
@@ -137,9 +137,15 @@ ActionManager.prototype.removeGamerToUpdate = function(id) {
 ActionManager.prototype.update = function() {
     if(this.ongoing !== true) {
         /* Etape d'update */
-        var _this = this;
+        var _this = this,
+            start;
 
-        function step() {
+        function step(timestamp) {
+            console.log("new step!");
+
+            if(typeof start === "undefined")
+                start = new Date();
+
             var positionChanged = false,
                 newPositions = [];
 
@@ -164,7 +170,24 @@ ActionManager.prototype.update = function() {
             }
 
             /* Mise a jour des tirs */
-//            for(id in )
+            var time_diff = timestamp - start;
+            positionChanged = _this.weaponery.update(time_diff);
+
+//            var bloc, bulletsToSend = [];
+//            for(id in _this.weaponery.bullets) {
+//                bloc = _this.weaponery.bullets[id];
+//                bulletsToSend.push({
+//                    type: 'bullet',
+//                    bloc: {
+//                        pos_x: bloc.x,
+//                        pos_y: bloc.y,
+//                        height: bloc.height,
+//                        width: bloc.width,
+//                        color: bloc.color
+//                    }
+//                });
+//            }
+            start = timestamp;
 
             /* On fait affiche l'ensemble des modifs au sommet */
             _this.positionChanged = positionChanged;
@@ -172,8 +195,8 @@ ActionManager.prototype.update = function() {
 
             if(positionChanged) {
                 setTimeout(function() {
-                    step();
-                }, 200);
+                    step(new Date());
+                }, Math.max(0, 1000/60 - time_diff));
             } else {
                 _this.ongoing = false;
             }
@@ -184,14 +207,11 @@ ActionManager.prototype.update = function() {
     }
 };
 
-var BroadcastManager = function() {
-    var _this = this;
-};
+var BroadcastManager = function() {};
 
 BroadcastManager.prototype.move = function(positionChanged, newPositions) {
-    if(positionChanged) {
-        io.emit('newPositions', newPositions);
-    }
+    /* On le dit à l'ensemble des personnes connectées */
+    io.emit('newPositions', newPositions);
 };
 
 BroadcastManager.prototype.addGamer = function(gamer) {
@@ -242,7 +262,12 @@ Game.prototype.update = function() {
 
     /* Toutes les 60ms on envoie les positions */
     setInterval(function() {
-        _this.broadcast.move(_this.actionManager.positionChanged, _this.actionManager.newPositions);
+        if(_this.actionManager.positionChanged) {
+            _this.broadcast.move(_this.actionManager.newPositions);
+
+            // Mettre a jour la position de l'ensemble des positions coté modele du serveur
+//            _this.gamerManager.updatePositions(_this.actionManager.newPositions);
+        }
     }, 1000/60);
 
     io.on('connection', function(socket){

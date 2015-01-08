@@ -87,8 +87,12 @@ WeaponeryManager.prototype.update = function(time_diff) {
         }
     }
 
-    if(nbBullet == 0)
+    if(nbBullet == 0) {
         this.bullets = [];
+        return false;
+    } else {
+        return true;
+    }
 };
 
 module.exports = {
