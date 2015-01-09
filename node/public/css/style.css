@@ -62,3 +62,9 @@ form {
 .right {
     text-align: right;
 }
+
+#gamersInfo {
+    float: left;
+    width: 200pt;
+    padding-left: 50pt;
+}

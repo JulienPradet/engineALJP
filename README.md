@@ -88,3 +88,8 @@ Ainsi, ca nous donne :
 
 # Les points à réfléchir
 On envoie au client chaque changement. Cependant, s'il en loupe un, qu'est ce que ca engendre ? Grave ?
+
+Pour la suite il y a plusieurs pistes.
+ - on peut avoir un serveur avec juste les données et plusieurs serveurs de calculs qui calculent les positions et interagissent avec les clients et envoient toutes les données au serveur de données;
+ - on peut répartir les joueurs selon la charge (avec un load balancing) sur plusieurs VMs;
+ - on peut faire plusieurs maps, une par VM, qui se créent à la demande (déploiement de VMs automatique).
