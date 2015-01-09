@@ -272,6 +272,13 @@ BroadcastManager.prototype.deleteGamer = function(id) {
     io.emit('deleteGamer', id);
 };
 
+BroadcastManager.prototype.setGamerNickname = function(id, newNickname) {
+    io.emit('setGamerNickname', {
+        id: id,
+        newNickname: newNickname
+    })
+};
+
 
 
 
@@ -345,6 +352,12 @@ Game.prototype.update = function() {
                 _this.gamerManager.gamers[charActions.id].char
             );
             _this.actionManager.update();
+        });
+
+        socket.on('nickname', function(newNickname) {
+            _this.gamerManager.gamers[gamer.id].nickname = newNickname;
+            console.log(newNickname);
+            _this.broadcast.setGamerNickname(gamer.id, newNickname);
         });
 
         /* On gère la déconnexion */

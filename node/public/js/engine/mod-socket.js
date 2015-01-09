@@ -19,16 +19,17 @@ engineALJP.socket.on('gamers', function(gamers) {
 engineALJP.socket.on('id', function(id) {
     treeGame.mainId = id;
     engineALJP.startGame();
-    treeGame.gamerManager.gamerView.init(id);
 });
 
 engineALJP.socket.on('addGamer', function(gamer) {
     treeGame.gamerManager.addGamer(gamer);
-    treeGame.gamerManager.gamerView.addGamer(gamer);
 });
 
 engineALJP.socket.on('deleteGamer', function(id) {
     treeGame.gamerManager.deleteGamer(id);
-    treeGame.gamerManager.gamerView.deleteGamer(id);
+});
+
+engineALJP.socket.on('setGamerNickname', function(infos) {
+    treeGame.gamerManager.setGamerNickname(infos.id, infos.newNickname);
 });
 

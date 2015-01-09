@@ -83,6 +83,8 @@ engineALJP.GamerManager.prototype.addGamer = function(gamer) {
             )
         );
     }
+
+    treeGame.gamerManager.gamerView.addGamer(gamer);
 };
 
 engineALJP.GamerManager.prototype.deleteGamer = function(id) {
@@ -92,6 +94,8 @@ engineALJP.GamerManager.prototype.deleteGamer = function(id) {
     if(typeof this.gamers[id] !== "undefined") {
         delete this.gamers[id];
     }
+
+    treeGame.gamerManager.gamerView.deleteGamer(id);
 };
 
 engineALJP.GamerManager.prototype.update = function(id, position) {
@@ -99,6 +103,11 @@ engineALJP.GamerManager.prototype.update = function(id, position) {
         return;
 
     this.gamers[id].setPosition(position);
+};
+
+engineALJP.GamerManager.prototype.setGamerNickname = function(id, newNickname) {
+    treeGame.gamerManager.gamers[id].nickname = newNickname;
+    treeGame.gamerManager.gamerView.setGamerNickname(id, newNickname);
 };
 
 
@@ -114,14 +123,27 @@ engineALJP.GamerView = function() {
         _this.initialized = false;
         _this.mainGamer = document.getElementById('mainGamer');
         _this.listGamers = document.getElementById('listGamers');
+        _this.newNickname = document.changeNickname.newNickname;
+        _this.newNicknameButton = document.changeNickname.button;
     })();
 };
 
 engineALJP.GamerView.prototype.init = function(id) {
     this.initialized = true;
 
-    this.mainGamer.style.color = treeGame.gamerManager.gamers[id].char.color;
-    this.mainGamer.innerHTML = treeGame.gamerManager.gamers[id].nickname;
+    this.mainGamer.style.color = treeGame.gamerManager.gamers[treeGame.mainId].char.color;
+    this.mainGamer.innerHTML = treeGame.gamerManager.gamers[treeGame.mainId].nickname;
+
+    var _this = this;
+    this.newNicknameButton.addEventListener("click", function() {
+        var newNickname = _this.newNickname.value;
+
+        if (typeof newNickname === 'undefined' || newNickname == '' || newNickname.length > 12)
+            return;
+
+        _this.mainGamer.innerHTML = newNickname;
+        engineALJP.socket.emit('nickname', newNickname);
+    });
 
     for (var i=0; i<treeGame.gamerManager.gamers.length; ++i) {
         if (typeof treeGame.gamerManager.gamers[i] === 'undefined' || treeGame.gamerManager.gamers[i] == null)
@@ -161,6 +183,21 @@ engineALJP.GamerView.prototype.deleteGamer = function(id) {
 
         if (gamerId == id) {
             gamer.remove();
+        }
+    }
+};
+
+engineALJP.GamerView.prototype.setGamerNickname = function(id, newNickname) {
+    if (!this.initialized)
+        return;
+
+    var gamers = this.listGamers.children;
+    for (var i=0; i<gamers.length; ++i) {
+        var gamer = gamers[i];
+        var gamerId = gamer.getAttribute("data-gamer-id");
+
+        if (gamerId == id) {
+            gamer.innerHTML = newNickname;
         }
     }
 };

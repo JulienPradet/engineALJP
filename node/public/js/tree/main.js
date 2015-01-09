@@ -27,4 +27,7 @@ engineALJP.startGame = function() {
     /* On commence l'animation */
     treeGame.moveManager = new engineALJP.move.Manager(treeGame.currentMap, treeGame.gamerManager, treeGame.weaponery);
     treeGame.moveManager.initEventsListeners();
+
+    /* On initialise la vue pour les informations sur les joueurs */
+    treeGame.gamerManager.gamerView.init();
 };
