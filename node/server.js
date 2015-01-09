@@ -9,9 +9,6 @@ var mapFactory = require('./mapFactory.js'),
     io;
 
 
-
-
-
 /* ActionManager */
 
 /* Gestion de la socket qui écoute les changements de position de l'utilisateur */
@@ -67,8 +64,8 @@ var ActionManager = function(weaponery) {
             "action": function(_this, time_diff, increments) {
                 // On tire
                 _this.weaponery.fire(
-                    increments.pos_x + 8,
-                    increments.pos_y + 8,
+                    increments.pos_x + 6,
+                    increments.pos_y + 6,
                     {
                         x: increments.velocity_x,
                         y: increments.velocity_y
@@ -83,8 +80,7 @@ var ActionManager = function(weaponery) {
 
 ActionManager.prototype.getIncrements = function(id, actions, time_diff, increments) {
     /* On les calcule pour un jeu de plateforme */
-    var useStep = false,
-        i, action;
+    var i, action;
 
     increments = this.actionToIncrement.init(this, time_diff, increments);
 
@@ -117,17 +113,26 @@ ActionManager.prototype.updateGamer = function(id) {
 
     var timestamp = new Date(),
         time_diff = timestamp - this.gamersToUpdate[id].lastMove;
+    this.gamersToUpdate[id].lastMove = timestamp;
 
     /* Déplacement du personnage */
     return this.getIncrements(id, this.gamersToUpdate[id].actions, time_diff, increments);
 };
 
 /* Définition de joueur à mettre a jour*/
-ActionManager.prototype.setGamerToUpdate = function(id, actions, lastMove, character) {
+ActionManager.prototype.setGamerToUpdate = function(id, actions, character) {
+    var lastMove = new Date();
+    if(typeof this.gamersToUpdate[id] !== "undefined") {
+        if(new Date() - this.gamersToUpdate[id].lastMove > 1000/60) {
+            lastMove = this.gamersToUpdate[id].lastMove;
+        } else {
+            lastMove = new Date() - 1000/60;
+        }
+    }
     this.gamersToUpdate[id] = {
         id: id,
         actions: actions,
-        lastMove: new Date(),
+        lastMove: lastMove,
         character: character
     };
 };
@@ -142,15 +147,18 @@ ActionManager.prototype.removeGamerToUpdate = function(id) {
 /* Mise a jour des positions en continu */
 ActionManager.prototype.update = function() {
     if(this.ongoing !== true) {
+        this.ongoing = true;
+
         /* Etape d'update */
         var _this = this,
             start = new Date();
 
         function step(timestamp) {
-            console.log("new step!");
-
             if(typeof start === "undefined")
                 start = new Date();
+
+            var time_diff = timestamp - start;
+            start = timestamp;
 
             var positionChanged = false,
                 newPositions = [];
@@ -177,24 +185,21 @@ ActionManager.prototype.update = function() {
             }
 
             /* Mise a jour des tirs */
-            var time_diff = timestamp - start;
             positionChanged = _this.weaponery.update(time_diff) || positionChanged;
 
-//            var bloc, bulletsToSend = [];
-//            for(id in _this.weaponery.bullets) {
-//                bloc = _this.weaponery.bullets[id];
-//                bulletsToSend.push({
-//                    type: 'bullet',
-//                    bloc: {
-//                        pos_x: bloc.x,
-//                        pos_y: bloc.y,
-//                        height: bloc.height,
-//                        width: bloc.width,
-//                        color: bloc.color
-//                    }
-//                });
-//            }
-            start = timestamp;
+            var bloc;
+            for(id in _this.weaponery.bullets) {
+                bloc = _this.weaponery.bullets[id].bloc;
+                newPositions.push({
+                    type: 'bullet',
+                    bloc: {
+                        x: bloc.x,
+                        y: bloc.y,
+                        height: bloc.height,
+                        width: bloc.width
+                    }
+                });
+            }
 
             /* On fait affiche l'ensemble des modifs au sommet */
             _this.positionChanged = positionChanged;
@@ -203,13 +208,12 @@ ActionManager.prototype.update = function() {
             if(positionChanged) {
                 setTimeout(function() {
                     step(new Date());
-                }, Math.max(0, 1000/60 - time_diff));
+                }, 1000 / 60);
             } else {
                 _this.ongoing = false;
             }
         }
 
-        this.ongoing = true;
         step(new Date());
     }
 };
@@ -336,7 +340,6 @@ Game.prototype.update = function() {
             _this.actionManager.setGamerToUpdate(
                 charActions.id,
                 charActions.actions,
-                _this.gamerManager.gamers[charActions.id].lastMove,
                 _this.gamerManager.gamers[charActions.id].char
             );
             _this.actionManager.update();

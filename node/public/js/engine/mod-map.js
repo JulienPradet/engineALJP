@@ -61,7 +61,7 @@ engineALJP.map.Bloc = function(options) {
             _this.zoom = options.zoom;
 
             if(typeof options.background === "undefined")
-                options.background = "#79f";
+                options.background = "#7799ff";
             _this.background = options.background;
 
             if (typeof options.viscosity === "undefined")
@@ -147,7 +147,7 @@ engineALJP.map.Bloc.prototype.draw = function(ctx, offsetX, offsetY) {
 
         /* Si c'est une chaine de caractère décrivant une couleur hexadecimale */
         if(typeof this.background === "string" && !!this.background.match(/^#([0-9A-Fa-f]{3}){1,2}/)) {
-            engineALJP.canvasExtension.drawRotatedRectangle(x, y, this.width, this.height, this.angle, this.background);
+            engineALJP.canvasExtension.drawRotatedRectangle(parseInt(x), parseInt(y), parseInt(this.width), parseInt(this.height), this.angle, this.background);
 
         /* Si c'est un sprite */
         } else if(this.background instanceof engineALJP.sprite.sprite) {
