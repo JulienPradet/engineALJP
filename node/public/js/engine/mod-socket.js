@@ -3,9 +3,12 @@
  */
 
 engineALJP.socket = io();
-
-engineALJP.socket.on('newPositions', function(newPositions){
-    treeGame.moveManager.updatePositions(newPositions);
+engineALJP.lastUpdate = new Date() - 0;
+engineALJP.socket.on('newPositions', function(update){
+    if(update.timestamp > engineALJP.lastUpdate) {
+        engineALJP.lastUpdate = update.timestamp;
+        treeGame.moveManager.updatePositions(update.newPositions);
+    }
 });
 
 engineALJP.socket.on('gamers', function(gamers) {

@@ -44,8 +44,8 @@ engineALJP.move.Manager.prototype.frame = function() {
         offsetY = posMainCharY - (engineALJP.options.height - engineALJP.char.height)/2;
 
     this.map.draw(engineALJP.ctx, offsetX, offsetY);
-    this.gamerManager.draw(engineALJP.ctx, offsetX, offsetY);
     this.weaponery.draw(engineALJP.ctx, offsetX, offsetY);
+    this.gamerManager.draw(engineALJP.ctx, offsetX, offsetY);
 
     return true;
 };
@@ -56,9 +56,9 @@ engineALJP.move.Manager.prototype.drawLoop = function() {
     /* Affichage de la nouvelle frame */
     if(this.frame()) {
         /* Continue l'affichage dès qu'il peut (fonction optimisée par le navigateur) */
-        requestAnimationFrame(function() {
+        setTimeout(function() {
             _this.drawLoop();
-        });
+        }, 1000/60);
     }
 };
 
@@ -78,14 +78,12 @@ engineALJP.move.Manager.prototype.updatePositions = function(newPositions) {
     for (var i=0; i<newPositions.length; ++i) {
         if (newPositions[i].type === "char") {
             this.gamerManager.update(newPositions[i].id, newPositions[i].position);
-//            console.log("Je vais mettre à jour un character.");
         } else if (newPositions[i].type === "bullet") {
-//            console.log("Je vais mettre à jour un bullet.");
             bullets.push(
-                new engineALJP.weaponery.Bullet({
-                    x: newPositions[i].bloc.x,
-                    y: newPositions[i].bloc.y
-                })
+                new engineALJP.weaponery.Bullet(
+                    newPositions[i].bloc.x,
+                    newPositions[i].bloc.y
+                )
             );
         }
     }

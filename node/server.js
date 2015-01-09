@@ -23,47 +23,49 @@ var ActionManager = function(weaponery) {
         _this.ongoing = false;
 
         _this.actionToIncrement = {
-            "left": function(_this, time_diff, increments) {
+            "left": function(gamer, time_diff, increments) {
                 increments.velocity_x = -1;
                 increments.hasChanged = true;
                 return increments;
             },
-            "right": function(_this, time_diff, increments) {
+            "right": function(gamer, time_diff, increments) {
                 increments.velocity_x = 1;
                 increments.hasChanged = true;
                 return increments;
             },
-            "top": function(_this, time_diff, increments) {
+            "top": function(gamer, time_diff, increments) {
                 increments.velocity_y = -1;
                 increments.hasChanged = true;
                 return increments;
             },
-            "down": function(_this, time_diff, increments) {
+            "down": function(gamer, time_diff, increments) {
                 increments.velocity_y = 1;
                 increments.hasChanged = true;
                 return increments;
             },
-            "static": function(_this, time_diff, increments) {
+            "static": function(gamer, time_diff, increments) {
                 increments.velocity_x = 0;
                 increments.velocity_y = 0;
                 increments.hasChanged = false;
                 return increments;
             },
-            "physicMove": function(_this, time_diff, increments) {
+            "physicMove": function(gamer, time_diff, increments) {
                 increments.pos_x = increments.pos_x + increments.velocity_x * time_diff / 1000 * 60;
                 increments.pos_y = increments.pos_y + increments.velocity_y * time_diff / 1000 * 60;
                 increments.hasChanged = true;
                 return increments;
             },
-            "init": function(_this, time_diff, increments) {
+            "init": function(gamer, time_diff, increments) {
                 increments.velocity_x = 0;
                 increments.velocity_y = 0;
                 increments.hasChanged = false;
+                increments.hasFired = false
                 return increments
             },
-            "action": function(_this, time_diff, increments) {
+            "action": function(gamer, time_diff, increments) {
                 // On tire
-                _this.weaponery.fire(
+                increments.hasFired = _this.weaponery.fire(
+                    gamer.lastFire,
                     increments.pos_x + 6,
                     increments.pos_y + 6,
                     {
@@ -82,27 +84,19 @@ ActionManager.prototype.getIncrements = function(id, actions, time_diff, increme
     /* On les calcule pour un jeu de plateforme */
     var i, action;
 
-    increments = this.actionToIncrement.init(this, time_diff, increments);
+    increments = this.actionToIncrement.init(this.gamersToUpdate[id], time_diff, increments);
 
     for(i in actions) {
         action = actions[i];
         if(action.ongoing) {
-            increments = this.actionToIncrement[action.type](this, time_diff, increments);
+            increments = this.actionToIncrement[action.type](this.gamersToUpdate[id], time_diff, increments);
         }
     }
 
     if(increments.hasChanged) {
-        increments = this.actionToIncrement.physicMove(this, time_diff, increments);
-        this.newPositions.push({
-            'type': 'char',
-            'id': id,
-            'position': {
-                'pos_x': increments.pos_x,
-                'pos_y': increments.pos_y
-            }
-        });
+        increments = this.actionToIncrement.physicMove(this.gamersToUpdate[id], time_diff, increments);
     } else {
-        this.actionToIncrement.static(this, time_diff, increments);
+        increments = this.actionToIncrement.static(this.gamersToUpdate[id], time_diff, increments);
     }
 
     return increments;
@@ -170,10 +164,12 @@ ActionManager.prototype.update = function() {
                 var increments = _this.updateGamer(id);
                 if(increments.hasChanged) {
                     positionChanged = true;
+                    _this.gamersToUpdate[id].lastFire = (increments.hasFired ? new Date(): gamer.lastFire)
                     newPositions.push({
                         type: 'char',
                         id: id,
                         lastMove: timestamp,
+                        lastFire: _this.gamersToUpdate[id].lastFire,
                         position: {
                             pos_x: increments.pos_x,
                             pos_y: increments.pos_y
@@ -202,8 +198,8 @@ ActionManager.prototype.update = function() {
             }
 
             /* On fait affiche l'ensemble des modifs au sommet */
-            _this.positionChanged = positionChanged;
             _this.newPositions = newPositions;
+            _this.positionChanged = positionChanged;
 
             if(positionChanged) {
                 setTimeout(function() {
@@ -248,6 +244,7 @@ GamerManager.prototype.updatePositions = function(newPositions) {
         if(change.type === 'char') {
             this.gamers[change.id].setPosition(change.position);
             this.gamers[change.id].lastMove = change.lastMove;
+            this.gamers[change.id].lastFire = change.lastFire;
         }
     }
 };
@@ -261,7 +258,10 @@ GamerManager.prototype.updatePositions = function(newPositions) {
 var BroadcastManager = function() {};
 
 BroadcastManager.prototype.move = function(newPositions) {
-    io.emit('newPositions', newPositions);
+    io.emit('newPositions', {
+        timestamp: new Date() - 0,
+        newPositions: newPositions
+    });
 };
 
 BroadcastManager.prototype.addGamer = function(gamer) {
@@ -323,6 +323,8 @@ Game.prototype.update = function() {
 
             /* On met à jour la position de l'ensemble des positions coté modèle du serveur */
             _this.gamerManager.updatePositions(_this.actionManager.newPositions);
+
+            _this.actionManager.positionChanged = false;
         }
     }, 1000/60);
 

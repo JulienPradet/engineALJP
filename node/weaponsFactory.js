@@ -50,9 +50,11 @@ WeaponeryManager.prototype.addWeapon = function(weapon) {
     }
 };
 
-WeaponeryManager.prototype.fire = function(x, y, velocity) {
-    if(new Date() - this.lastFire > 250 && this.currentWeapon !== false) {
-        this.lastFire = new Date();
+WeaponeryManager.prototype.fire = function(lastFire, x, y, velocity) {
+    if(typeof lastFire === "undefined") {
+        lastFire = 0;
+    }
+    if(new Date() - lastFire > 250 && this.currentWeapon !== false) {
         var i, length, created = false;
         length = this.bullets.length;
         for(i = 0; i < length; i++) {
@@ -64,7 +66,9 @@ WeaponeryManager.prototype.fire = function(x, y, velocity) {
         }
         if(!created)
             this.bullets.push(this.currentWeapon.getBullet(x, y, velocity));
+        return true;
     }
+    return false;
 };
 
 WeaponeryManager.prototype.update = function(time_diff) {

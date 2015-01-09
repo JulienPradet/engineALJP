@@ -26,15 +26,7 @@ engineALJP.weaponery.Bullet = function(x, y, height, width, color) {
 };
 
 engineALJP.weaponery.Bullet.prototype.draw = function(ctx, offsetX, offsetY) {
-    console.log("drawBullet");
-//    this.bloc.draw(ctx, offsetX, offsetY);
-    var x = this.bloc.x - offsetX;
-    var y = this.bloc.y - offsetY;
-
-    ctx.rect(100, 100, 4, 4);
-    ctx.fillStyle = "#000000";
-    ctx.fill();
-
+    engineALJP.canvasExtension.drawRotatedRectangle(this.bloc.x - offsetX, this.bloc.y - offsetY, 4, 4, 0, "#000000");
 };
 
 engineALJP.weaponery.WeaponeryManager = function() {
@@ -48,10 +40,11 @@ engineALJP.weaponery.WeaponeryManager = function() {
 engineALJP.weaponery.WeaponeryManager.prototype.draw = function(ctx, offsetX, offsetY) {
     var i = 0,
         length = this.bullets.length;
+    var bullets = this.bullets;
     for(; i < length; i++) {
-        if(typeof this.bullets[i] !== "undefined") {
-            this.bullets[i].draw(ctx, offsetX, offsetY);
+        if(typeof bullets[i] !== "undefined") {
+            bullets[i].draw(ctx, offsetX, offsetY);
         }
     }
-    this.bullets = [];
+
 };
