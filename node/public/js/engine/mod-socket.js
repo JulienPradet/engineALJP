@@ -9,51 +9,23 @@ engineALJP.socket.on('newPositions', function(newPositions){
 });
 
 engineALJP.socket.on('gamers', function(gamers) {
-    treeGame.gameManager = new engineALJP.GamerManager([]);
-
-    for (var i=0; i<gamers.length; ++i) {
-        var gamer = gamers[i];
-
-        if (typeof gamer === 'undefined' || gamer == null)  {
-            continue;
-        }
-
-        treeGame.gameManager.addGamer(gamer);
-    }
+    treeGame.gamerManager = new engineALJP.GamerManager([], new engineALJP.GamerView());
+    treeGame.gamerManager.init(gamers);
 });
 
 engineALJP.socket.on('id', function(id) {
     treeGame.mainId = id;
     engineALJP.startGame();
-
-    var gamersInfo = document.getElementById('gamersInfo');
-    var mainGamer = document.createElement("p");
-    mainGamer.style.color = treeGame.gameManager.gamers[id].char.color;
-    mainGamer.innerHTML = treeGame.gameManager.gamers[id].nickname;
-    gamersInfo.appendChild(mainGamer);
-
-    var listGamers = document.createElement("ul");
-    for (var i=0; i<treeGame.gameManager.gamers.length; ++i) {
-        if (typeof treeGame.gameManager.gamers[i] === 'undefined' || treeGame.gameManager.gamers[i] == null)
-            continue;
-
-        var gamer = treeGame.gameManager.gamers[i];
-        if (gamer.id == treeGame.mainId)
-            continue;
-
-        var gamerListed = document.createElement("li");
-        gamerListed.style.color = gamer.char.color;
-        gamerListed.innerHTML = gamer.nickname;
-        listGamers.appendChild(gamerListed);
-    }
-    gamersInfo.appendChild(listGamers);
+    treeGame.gamerManager.gamerView.init(id);
 });
 
 engineALJP.socket.on('addGamer', function(gamer) {
-    treeGame.gameManager.addGamer(gamer);
+    treeGame.gamerManager.addGamer(gamer);
+    treeGame.gamerManager.gamerView.addGamer(gamer);
 });
 
 engineALJP.socket.on('deleteGamer', function(id) {
-    treeGame.gameManager.deleteGamer(id);
+    treeGame.gamerManager.deleteGamer(id);
+    treeGame.gamerManager.gamerView.deleteGamer(id);
 });
 
