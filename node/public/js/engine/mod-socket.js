@@ -22,6 +22,7 @@ engineALJP.socket.on('id', function(id) {
 });
 
 engineALJP.socket.on('addGamer', function(gamer) {
+    console.log("add");
     treeGame.gamerManager.addGamer(gamer);
 });
 

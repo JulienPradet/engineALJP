@@ -265,36 +265,35 @@ var MultiServerManager = function() {
 
         var context = rabbit.createContext();
         context.on('ready', function() {
-            _this.sub = context.socket('SUBSCRIBE', {routing: 'direct'});
+            _this.sub = context.socket('SUBSCRIBE');
 
-            ['move', 'addGamer'].forEach(function(functionName) {
-                _this.sub.connect('events', functionName, function() {
-                    _this.sub.on('data', function(data) {
-                        _this.broadcastManager[functionName](JSON.parse(data));
-                    });
+            _this.sub.connect('gameALJP', function() {
+                _this.sub.on('data', function(msg) {
+                    var msg = JSON.parse(msg);
+                    _this.broadcastManager[msg.functionName](msg.data);
                 });
             });
 
-            _this.pub = context.socket('PUBLISH', {routing: 'direct'});
-            _this.pub.connect('events');
+            _this.pub = context.socket('PUBLISH');
+            _this.pub.connect('gameALJP');
         });
     })();
 };
 
 MultiServerManager.prototype.move = function(newPositions) {
-    this.pub.publish('move', JSON.stringify(newPositions));
+    this.pub.publish('move', JSON.stringify({functionName: 'move', data: newPositions}));
 };
 
 MultiServerManager.prototype.addGamer = function(gamer) {
-    this.pub.publish('addGamer', JSON.stringify(gamer));
+    this.pub.publish('addGamer', JSON.stringify({functionName: 'addGamer', data: gamer}));
 };
 
 MultiServerManager.prototype.deleteGamer = function(id) {
-    this.pub.publish('deleteGamer', JSON.stringify(id));
+    this.pub.publish('deleteGamer', JSON.stringify({functionName: 'deleteGamer', data: id}));
 };
 
-MultiServerManager.prototype.setGamerNickname = function(id, newNickname) {
-    this.pub.publish('setGamerNickname', JSON.stringify(id, newNickname));
+MultiServerManager.prototype.setGamerNickname = function(data) {
+    this.pub.publish('setGamerNickname', JSON.stringify({functionName: 'setGamerNickname', data: data}));
 };
 
 
@@ -321,11 +320,8 @@ BroadcastManager.prototype.deleteGamer = function(id) {
     io.emit('deleteGamer', id);
 };
 
-BroadcastManager.prototype.setGamerNickname = function(id, newNickname) {
-    io.emit('setGamerNickname', {
-        id: id,
-        newNickname: newNickname
-    })
+BroadcastManager.prototype.setGamerNickname = function(data) {
+    io.emit('setGamerNickname', data)
 };
 
 
@@ -391,9 +387,11 @@ Game.prototype.update = function() {
     io.on('connection', function(socket){
         /* On envoie le tableau des joueurs pré-existants au nouveau connecté */
         socket.emit('gamers', _this.gamerManager.gamers);
+
         /* On crée le joueur et on prévient tout le monde */
         var gamer = _this.gamerManager.addGamer();
         _this.broadcast.addGamer(gamer);
+
         /* On dit au nouveau connecté quel joueur il est */
         socket.emit('id', gamer.id);
 
@@ -409,7 +407,7 @@ Game.prototype.update = function() {
 
         socket.on('nickname', function(newNickname) {
             _this.gamerManager.gamers[gamer.id].nickname = newNickname;
-            _this.broadcast.setGamerNickname(gamer.id, newNickname);
+            _this.broadcast.setGamerNickname({id: gamer.id, newNickname: newNickname});
         });
 
         /* On gère la déconnexion */

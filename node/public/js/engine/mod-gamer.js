@@ -128,7 +128,7 @@ engineALJP.Gamer.GamerView = function() {
     })();
 };
 
-engineALJP.Gamer.GamerView.prototype.init = function(id) {
+engineALJP.Gamer.GamerView.prototype.init = function() {
     this.initialized = true;
 
     this.mainGamer.style.color = treeGame.gamerManager.gamers[treeGame.mainId].char.color;
