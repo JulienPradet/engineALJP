@@ -155,7 +155,7 @@ engineALJP.controls.actionToCode = {
     right: 39,
     top: 38,
     down: 40,
-    action: 65
+    action: 32
 };
 
 /**
@@ -167,7 +167,7 @@ engineALJP.controls.codeToAction = {
     39: "right",
     38: "top",
     40: "down",
-    65: "action"
+    32: "action"
 };
 
 /**

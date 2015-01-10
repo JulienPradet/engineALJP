@@ -29,7 +29,7 @@ engineALJP.Gamer.prototype.draw = function(ctx, offsetX, offsetY) {
 
 /* GamerManager */
 
-engineALJP.GamerManager = function(gamers, gamerView) {
+engineALJP.Gamer.GamerManager = function(gamers, gamerView) {
     var _this = this;
 
     (function() {
@@ -39,7 +39,7 @@ engineALJP.GamerManager = function(gamers, gamerView) {
     })();
 };
 
-engineALJP.GamerManager.prototype.init = function(gamers) {
+engineALJP.Gamer.GamerManager.prototype.init = function(gamers) {
     this.initialized = true;
 
     for (var i=0; i<gamers.length; ++i) {
@@ -53,7 +53,7 @@ engineALJP.GamerManager.prototype.init = function(gamers) {
     }
 };
 
-engineALJP.GamerManager.prototype.draw = function(ctx, offsetX, offsetY) {
+engineALJP.Gamer.GamerManager.prototype.draw = function(ctx, offsetX, offsetY) {
     if (!this.initialized)
         return;
 
@@ -64,7 +64,7 @@ engineALJP.GamerManager.prototype.draw = function(ctx, offsetX, offsetY) {
     }
 };
 
-engineALJP.GamerManager.prototype.addGamer = function(gamer) {
+engineALJP.Gamer.GamerManager.prototype.addGamer = function(gamer) {
     if (!this.initialized)
         return;
 
@@ -87,7 +87,7 @@ engineALJP.GamerManager.prototype.addGamer = function(gamer) {
     treeGame.gamerManager.gamerView.addGamer(gamer);
 };
 
-engineALJP.GamerManager.prototype.deleteGamer = function(id) {
+engineALJP.Gamer.GamerManager.prototype.deleteGamer = function(id) {
     if (!this.initialized)
         return;
 
@@ -98,14 +98,14 @@ engineALJP.GamerManager.prototype.deleteGamer = function(id) {
     treeGame.gamerManager.gamerView.deleteGamer(id);
 };
 
-engineALJP.GamerManager.prototype.update = function(id, position) {
+engineALJP.Gamer.GamerManager.prototype.update = function(id, position) {
     if (!this.initialized)
         return;
 
     this.gamers[id].setPosition(position);
 };
 
-engineALJP.GamerManager.prototype.setGamerNickname = function(id, newNickname) {
+engineALJP.Gamer.GamerManager.prototype.setGamerNickname = function(id, newNickname) {
     treeGame.gamerManager.gamers[id].nickname = newNickname;
     treeGame.gamerManager.gamerView.setGamerNickname(id, newNickname);
 };
@@ -116,7 +116,7 @@ engineALJP.GamerManager.prototype.setGamerNickname = function(id, newNickname) {
 
 /* GamerView */
 
-engineALJP.GamerView = function() {
+engineALJP.Gamer.GamerView = function() {
     var _this = this;
 
     (function() {
@@ -128,14 +128,16 @@ engineALJP.GamerView = function() {
     })();
 };
 
-engineALJP.GamerView.prototype.init = function(id) {
+engineALJP.Gamer.GamerView.prototype.init = function(id) {
     this.initialized = true;
 
     this.mainGamer.style.color = treeGame.gamerManager.gamers[treeGame.mainId].char.color;
     this.mainGamer.innerHTML = treeGame.gamerManager.gamers[treeGame.mainId].nickname;
 
     var _this = this;
-    this.newNicknameButton.addEventListener("click", function() {
+    document.getElementById('changeNicknameForm').addEventListener("submit", function(evt) {
+        evt.preventDefault();
+
         var newNickname = _this.newNickname.value;
 
         if (typeof newNickname === 'undefined' || newNickname == '' || newNickname.length > 20)
@@ -157,7 +159,7 @@ engineALJP.GamerView.prototype.init = function(id) {
     }
 };
 
-engineALJP.GamerView.prototype.addGamer = function(gamer) {
+engineALJP.Gamer.GamerView.prototype.addGamer = function(gamer) {
     if (!this.initialized)
         return;
 
@@ -172,7 +174,7 @@ engineALJP.GamerView.prototype.addGamer = function(gamer) {
     this.listGamers.appendChild(gamerListed);
 };
 
-engineALJP.GamerView.prototype.deleteGamer = function(id) {
+engineALJP.Gamer.GamerView.prototype.deleteGamer = function(id) {
     if (!this.initialized)
         return;
 
@@ -187,7 +189,7 @@ engineALJP.GamerView.prototype.deleteGamer = function(id) {
     }
 };
 
-engineALJP.GamerView.prototype.setGamerNickname = function(id, newNickname) {
+engineALJP.Gamer.GamerView.prototype.setGamerNickname = function(id, newNickname) {
     if (!this.initialized)
         return;
 

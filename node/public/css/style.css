@@ -88,7 +88,7 @@ form {
     width: 140pt;
 }
 
-#gamersInfo input[type=button] {
+#gamersInfo input[type=submit] {
     background-color: #eeeeee;
     border: none;
     border-radius: 0 3pt 3pt 0;
@@ -97,9 +97,13 @@ form {
     vertical-align: middle;
 }
 
-#gamersInfo input[type=button]:focus,
-#gamersInfo input[type=button]:hover {
-    color: #898989      ;
+#gamersInfo input[type=submit]:hover,
+#gamersInfo input[type=submit]:focus {
+    color: #898989;
+}
+
+#gamersInfo input[type=submit]:active {
+    color: #ffffff;
 }
 
 #listGamers {

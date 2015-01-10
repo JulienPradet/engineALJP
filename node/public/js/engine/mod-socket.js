@@ -12,7 +12,7 @@ engineALJP.socket.on('newPositions', function(update){
 });
 
 engineALJP.socket.on('gamers', function(gamers) {
-    treeGame.gamerManager = new engineALJP.GamerManager([], new engineALJP.GamerView());
+    treeGame.gamerManager = new engineALJP.Gamer.GamerManager([], new engineALJP.Gamer.GamerView());
     treeGame.gamerManager.init(gamers);
 });
 
