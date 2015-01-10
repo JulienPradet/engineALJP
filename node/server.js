@@ -6,6 +6,7 @@ var mapFactory = require('./mapFactory.js'),
     weaponsFactory = require('./weaponsFactory.js'),
     charFactory = require('./charFactory.js'),
     gamerFactory = require('./gamerFactory.js'),
+    rabbit = require('rabbit.js'),
     io;
 
 
@@ -253,6 +254,54 @@ GamerManager.prototype.updatePositions = function(newPositions) {
 
 
 
+/* Communication mutli-serveurs */
+
+var MultiServerManager = function() {
+    var _this = this;
+
+    (function() {
+        _this.broadcastManager = new BroadcastManager();
+
+
+        var context = rabbit.createContext();
+        context.on('ready', function() {
+            _this.sub = context.socket('SUBSCRIBE', {routing: 'direct'});
+
+            ['move', 'addGamer'].forEach(function(functionName) {
+                _this.sub.connect('events', functionName, function() {
+                    _this.sub.on('data', function(data) {
+                        _this.broadcastManager[functionName](JSON.parse(data));
+                    });
+                });
+            });
+
+            _this.pub = context.socket('PUBLISH', {routing: 'direct'});
+            _this.pub.connect('events');
+        });
+    })();
+};
+
+MultiServerManager.prototype.move = function(newPositions) {
+    this.pub.publish('move', JSON.stringify(newPositions));
+};
+
+MultiServerManager.prototype.addGamer = function(gamer) {
+    this.pub.publish('addGamer', JSON.stringify(gamer));
+};
+
+MultiServerManager.prototype.deleteGamer = function(id) {
+    this.pub.publish('deleteGamer', JSON.stringify(id));
+};
+
+MultiServerManager.prototype.setGamerNickname = function(id, newNickname) {
+    this.pub.publish('setGamerNickname', JSON.stringify(id, newNickname));
+};
+
+
+
+
+
+
 /* BroadcastManager */
 
 var BroadcastManager = function() {};
@@ -312,7 +361,11 @@ var Game = function() {
 };
 
 Game.prototype.init = function() {
-    this.broadcast = new BroadcastManager();
+    /* Le broadcast est différent selon si on a un ou plusieurs serveurs qui font tourner le jeu.
+    S'il n'y a qu'un seul serveur on instancie BroadcastManager qui enverra directement les messages aux clients.
+    S'il y a plusieurs serveurs, on instancie MultiServerManager qui comportera une instance de BroadcastManager.
+     */
+    this.broadcast = new MultiServerManager();
     this.actionManager = new ActionManager(this.weaponery);
 };
 
@@ -356,7 +409,6 @@ Game.prototype.update = function() {
 
         socket.on('nickname', function(newNickname) {
             _this.gamerManager.gamers[gamer.id].nickname = newNickname;
-            console.log(newNickname);
             _this.broadcast.setGamerNickname(gamer.id, newNickname);
         });
 

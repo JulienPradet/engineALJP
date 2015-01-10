@@ -9,7 +9,6 @@
 var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
-var actions = require('./actions.js');
 var mapFactory = require('./mapFactory.js');
 var charFactory = require('./charFactory.js');
 var gameServer = require('./server.js')(io);
