@@ -138,7 +138,7 @@ engineALJP.GamerView.prototype.init = function(id) {
     this.newNicknameButton.addEventListener("click", function() {
         var newNickname = _this.newNickname.value;
 
-        if (typeof newNickname === 'undefined' || newNickname == '' || newNickname.length > 12)
+        if (typeof newNickname === 'undefined' || newNickname == '' || newNickname.length > 20)
             return;
 
         _this.mainGamer.innerHTML = newNickname;

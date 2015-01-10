@@ -68,3 +68,40 @@ form {
     width: 200pt;
     padding-left: 50pt;
 }
+
+#gamersInfo form {
+    background-color: #eeeeee;
+    border-radius: 3pt;
+    border: 1pt #222222;
+    height: 16pt;
+    line-height: 16pt;
+}
+
+#gamersInfo input[type=text] {
+    background-color: #eeeeee;
+    border: none;
+    border-radius: 3pt 0 0 3pt;
+    height: 100%;
+    margin: 0pt;
+    padding-left: 4pt;
+    vertical-align: middle;
+    width: 140pt;
+}
+
+#gamersInfo input[type=button] {
+    background-color: #eeeeee;
+    border: none;
+    border-radius: 0 3pt 3pt 0;
+    min-width: 50pt;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#gamersInfo input[type=button]:focus,
+#gamersInfo input[type=button]:hover {
+    color: #898989      ;
+}
+
+#listGamers {
+    margin-top: 20pt;
+}
