@@ -229,9 +229,29 @@ var GamerManager = function() {
     })();
 };
 
-GamerManager.prototype.addGamer = function() {
-    var gamer = new gamerFactory.Gamer(this.gamers.length);
-    this.gamers.push(gamer);
+GamerManager.prototype.addGamer = function(gamer) {
+    if(typeof gamer === "undefined") {
+        gamer = new gamerFactory.Gamer(this.gamers.length);
+    } else if(!(gamer instanceof gamerFactory.Gamer)) {
+        var _gamer = new gamerFactory.Gamer(gamer.id);
+        _gamer.lastMove = gamer.lastMove;
+        _gamer.nickname = gamer.nickname;
+        _gamer.char.height = gamer.char.height;
+        _gamer.char.width = gamer.char.width;
+        _gamer.char.pos_x = gamer.char.pos_x;
+        _gamer.char.pos_y = gamer.char.pos_y;
+        _gamer.char.velocity_x = gamer.char.velocity_x;
+        _gamer.char.velocity_y = gamer.char.velocity_y;
+        _gamer.char.acceleration_x = gamer.char.acceleration_x;
+        _gamer.char.acceleration_y = gamer.char.acceleration_y;
+        _gamer.char.weight = gamer.char.weight;
+        _gamer.char.color = gamer.char.color;
+
+        gamer = _gamer;
+    }
+    console.log("addGamer:"+gamer.id);
+
+    this.gamers[gamer.id] = gamer;
     return gamer;
 };
 
@@ -250,17 +270,22 @@ GamerManager.prototype.updatePositions = function(newPositions) {
     }
 };
 
+GamerManager.prototype.setGamerNickname = function(data) {
+    this.gamers[data.id].nickname = data.newNickname;
+};
+
 
 
 
 
 /* Communication mutli-serveurs */
 
-var MultiServerManager = function() {
+var MultiServerManager = function(gamerManager) {
     var _this = this;
 
     (function() {
         _this.broadcastManager = new BroadcastManager();
+        _this.gamerManager = gamerManager;
 
 
         var context = rabbit.createContext();
@@ -271,6 +296,9 @@ var MultiServerManager = function() {
                 _this.sub.on('data', function(msg) {
                     var msg = JSON.parse(msg);
                     _this.broadcastManager[msg.functionName](msg.data);
+                    if(['addGamer', 'deleteGamer', 'setGamerNickname'].indexOf(msg.functionName) >= 0) {
+                        _this.gamerManager[msg.functionName](msg.data);
+                    }
                 });
             });
 
@@ -361,7 +389,7 @@ Game.prototype.init = function() {
     S'il n'y a qu'un seul serveur on instancie BroadcastManager qui enverra directement les messages aux clients.
     S'il y a plusieurs serveurs, on instancie MultiServerManager qui comportera une instance de BroadcastManager.
      */
-    this.broadcast = new MultiServerManager();
+    this.broadcast = new MultiServerManager(this.gamerManager);
     this.actionManager = new ActionManager(this.weaponery);
 };
 
@@ -397,6 +425,8 @@ Game.prototype.update = function() {
 
         /* On écoute les actions de l'utilisateur */
         socket.on('action', function(charActions) {
+            console.log("gamerToUpdate Char");
+            console.log(_this.gamerManager.gamers[charActions.id].char);
             _this.actionManager.setGamerToUpdate(
                 charActions.id,
                 charActions.actions,
@@ -406,7 +436,7 @@ Game.prototype.update = function() {
         });
 
         socket.on('nickname', function(newNickname) {
-            _this.gamerManager.gamers[gamer.id].nickname = newNickname;
+            _this.gamerManager.setGamerNickname({id: gamer.id, newNickname: newNickname});
             _this.broadcast.setGamerNickname({id: gamer.id, newNickname: newNickname});
         });
 
