@@ -60,7 +60,7 @@ var ActionManager = function(weaponery) {
                 increments.velocity_x = 0;
                 increments.velocity_y = 0;
                 increments.hasChanged = false;
-                increments.hasFired = false
+                increments.hasFired = false;
                 return increments
             },
             "action": function(gamer, time_diff, increments) {
@@ -425,8 +425,6 @@ Game.prototype.update = function() {
 
         /* On écoute les actions de l'utilisateur */
         socket.on('action', function(charActions) {
-            console.log("gamerToUpdate Char");
-            console.log(_this.gamerManager.gamers[charActions.id].char);
             _this.actionManager.setGamerToUpdate(
                 charActions.id,
                 charActions.actions,

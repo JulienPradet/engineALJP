@@ -2,10 +2,18 @@
  * Module de gestion de la socket pour communiquer avec le serveur
  */
 
+/* Calcul du ping */
+engineALJP.ping = [];
+engineALJP.pingIndex = 0;
+
 engineALJP.socket = io();
 engineALJP.lastUpdate = new Date() - 0;
 engineALJP.socket.on('newPositions', function(update){
     if(update.timestamp > engineALJP.lastUpdate) {
+        engineALJP.pingIndex = (engineALJP.pingIndex + 1) % 50;
+        engineALJP.ping[engineALJP.pingIndex] = new Date() - update.timestamp;
+
+        document.getElementById('devInfo').innerHTML = (engineALJP.ping.reduce(function(pv, cv) { return pv + cv; }, 0) / 10) + "ms";
         engineALJP.lastUpdate = update.timestamp;
         treeGame.moveManager.updatePositions(update.newPositions);
     }

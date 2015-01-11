@@ -83,7 +83,6 @@ WeaponeryManager.prototype.update = function(time_diff) {
 
     for(; i < length; i++) {
         if(typeof this.bullets[i] !== "undefined") {
-            console.log(this.bullets[i]);
             bullet = this.bullets[i];
             if(bullet.life > 0) {
                 position = bullet.bloc.getPosition();
