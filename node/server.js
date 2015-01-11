@@ -259,7 +259,7 @@ GamerManager.prototype.deleteGamer = function(id) {
     delete this.gamers[id];
 };
 
-GamerManager.prototype.updatePositions = function(newPositions) {
+GamerManager.prototype.move = function(newPositions) {
     for(var id in newPositions) {
         var change = newPositions[id];
         if(change.type === 'char') {
@@ -296,7 +296,7 @@ var MultiServerManager = function(gamerManager) {
                 _this.sub.on('data', function(msg) {
                     var msg = JSON.parse(msg);
                     _this.broadcastManager[msg.functionName](msg.data);
-                    if(['addGamer', 'deleteGamer', 'setGamerNickname'].indexOf(msg.functionName) >= 0) {
+                    if(['move', 'addGamer', 'deleteGamer', 'setGamerNickname'].indexOf(msg.functionName) >= 0) {
                         _this.gamerManager[msg.functionName](msg.data);
                     }
                 });
@@ -406,7 +406,7 @@ Game.prototype.update = function() {
             _this.broadcast.move(_this.actionManager.newPositions);
 
             /* On met à jour la position de l'ensemble des positions coté modèle du serveur */
-            _this.gamerManager.updatePositions(_this.actionManager.newPositions);
+            _this.gamerManager.move(_this.actionManager.newPositions);
 
             _this.actionManager.positionChanged = false;
         }

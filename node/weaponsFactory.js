@@ -58,7 +58,7 @@ WeaponeryManager.prototype.fire = function(lastFire, x, y, velocity) {
         var i, length, created = false;
         length = this.bullets.length;
         for(i = 0; i < length; i++) {
-            if(this.bullets[i].life <= 0) {
+            if(typeof this.bullets[i] === "undefined" || this.bullets[i].life <= 0) {
                 this.bullets[i] = this.currentWeapon.getBullet(x, y, velocity);
                 created = true;
                 break;
@@ -76,27 +76,33 @@ WeaponeryManager.prototype.update = function(time_diff) {
         length = this.bullets.length,
         bullet, position;
 
+    if(length === 0)
+        return false;
+
     var nbBullet = 0;
 
     for(; i < length; i++) {
-        bullet = this.bullets[i];
-        if(bullet.life > 0) {
-            position = bullet.bloc.getPosition();
-            bullet.bloc.setPosition({
-                top: position.top + bullet.velocity_y * time_diff / 1000 * 60,
-                left: position.left + bullet.velocity_x * time_diff / 1000 * 60
-            });
-            bullet.life--;
-            nbBullet++;
+        if(typeof this.bullets[i] !== "undefined") {
+            console.log(this.bullets[i]);
+            bullet = this.bullets[i];
+            if(bullet.life > 0) {
+                position = bullet.bloc.getPosition();
+                bullet.bloc.setPosition({
+                    top: position.top + bullet.velocity_y * time_diff / 1000 * 60,
+                    left: position.left + bullet.velocity_x * time_diff / 1000 * 60
+                });
+                bullet.life--;
+                nbBullet++;
+            } else {
+                delete this.bullets[i];
+            }
         }
     }
 
-    if(nbBullet == 0) {
+    if(nbBullet == 0)
         this.bullets = [];
-        return false;
-    } else {
-        return true;
-    }
+
+    return true;
 };
 
 module.exports = {
