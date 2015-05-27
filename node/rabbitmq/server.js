@@ -8,7 +8,7 @@ var app = express(),
     pub;
 
 http.createServer(app).listen(3000, function(){
-    console.log("RabbitMQ + Node.js app running on AppFog!");
+    console.log("RabbitMQ made to have interactions between node servers");
 
     var context = rabbit.createContext();
     console.log("Context created.");
